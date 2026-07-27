@@ -1,0 +1,488 @@
+---
+title: "Sanity check report"
+date: "`r Sys.time()`"
+date-format: "MMM D, YYYY @ HH:mm:ss"
+params:
+  summary_run: ""
+  summary_waking_hours: ""
+  summary_sleeping_hours: ""
+  include_plot: ""
+format: 
+  html:
+    page-layout: full
+    toc: true
+    toc-depth: 5
+    toc-expand: true
+    toc-location: left
+    embed-resources: true
+    code-fold: true
+    code-tools: true
+    code-line-numbers: true
+editor: source
+execute:
+  warning: false
+  message: false
+---
+
+```{=html}
+<style>
+  .notes, .blockquote { padding: 1rem; border-left: 3px solid #0d6efd; margin-top: 1rem; margin-bottom: 1rem; }
+  .notes > h3 { padding-top: 0; margin-top: 0; }
+  .math { font-size: 0.75rem; }
+  .highlight { background: yellow; }
+  .table th, .table td { font-size: 10px; }
+  .table td { vertical-align: middle; }
+  p, ul li { font-size: 14px; }
+  .level1 h1 { font-size: 20px; }
+  .level2 h2 { font-size: 16px; }
+  .level3 h3 { font-size: 16px; color: #0d6efd; }
+</style>
+```
+
+# Getting started
+
+```{r}
+# Load dependencies
+library(chms)
+library(dplyr)
+library(ggplot2)
+library(kableExtra)
+library(scales)
+library(stringr)
+library(tibble)
+
+# Wrangle data frames
+summary_run <- readRDS(file = params$summary_run) 
+summary_waking_hours <- readRDS(file = params$summary_waking_hours)
+
+summary_sleeping_hours <- readRDS(file = params$summary_sleeping_hours) |>
+  dplyr::left_join(
+    y = dplyr::bind_rows(
+      lapply(
+        X = unique(summary_run$participant_id),
+        FUN = function(x) {
+          # Get JSON data
+          json <- jsonlite::fromJSON(summary_run$device_settings[summary_run$participant_id == x]) 
+          
+          # If no data
+          if(is.null(nrow(json))) {
+            data.frame(
+              participant_id = x,
+              time_zone = NA
+            )
+          } else {
+            json |>
+              dplyr::select(time_zone) |>
+              dplyr::mutate(participant_id = x) |>
+              dplyr::relocate(participant_id) 
+          }
+        }
+      )
+    ),
+    by = "participant_id"
+  ) |>
+  dplyr::mutate(
+    dplyr::across(
+      .cols = nocturnal_sleep_onset:nocturnal_sleep_offset,
+      # .fns = ~ dplyr::case_when(
+      #   is.na(time_zone) ~ as.POSIXct(NA),
+      #   TRUE ~ as.POSIXct(as.numeric(.x), origin = "1970-01-01", tz = time_zone)
+      # )
+      .fns = ~ format(
+        x = .x,
+        format = "%Y-%m-%d %H:%M:%S"
+      )
+    )
+  )
+```
+
+Default settings:
+
+- Incomplete days (< 24 hours) of data are removed.
+- Sleep time, wear time and non-wear time are identified by applying the Barreira algorithm to data at the 60s epoch level.
+- Movement behaviours are identified by applying the following cut-points to `axis1` accelerometer counts to wear-time, non-sleep epochs:
+
+```{r, echo = FALSE}
+data.frame(
+  Age = c("3-5", "6-17", "18-64", "65+"),
+  Epoch = c(15, 15, 60, 60),
+  SB = c("0-24", "0-24", "0-99", "0-99"),
+  LPA = c("25-419", "25-573", "100-2,019", "100-2,019"),
+  MPA = c("420+", "574-1,002", "2,020-5,998", "2,020-5,998"),
+  VPA = c("&ndash;", "1,003+", "5,999+", "5,999+")
+) |>
+  dplyr::rename(
+    `Age (years)` = Age,
+    `Epoch (seconds)` = Epoch
+  ) |>
+  kableExtra::kbl(
+    align = "c",
+    escape = FALSE,
+  ) |>
+  kableExtra::kable_styling(bootstrap_options = c("hover", "striped"), font_size = 10) |>
+  kableExtra::add_header_above(c(" " = 2, "Cut-points" = 4))
+```
+
+# Sanity checks
+
+```{r, results = "asis", out.width = "100%"}
+# Don't output NA values
+options(knitr.kable.NA = "")
+
+# Iterate participants
+render_tables_and_plots <- lapply(
+  X = 1:nrow(summary_run),
+  FUN = function(x) {
+    # Render sidebar item
+    cat("## Participant", summary_run$participant_id[x])
+    cat("\n\n")
+    
+    # Render sidebar item
+    cat("### Parameters")
+    cat("\n\n")
+    
+    # Render table
+    cat(
+      dplyr::bind_rows(jsonlite::fromJSON(summary_run$args[x])) |> 
+        t() |> 
+        as.data.frame() |> 
+        tibble::rownames_to_column(var = "parameter") |>
+        dplyr::rename(
+          `Parameter name` = parameter,
+          `Parameter value` = V1
+        ) |>
+        kableExtra::kbl() |>
+        kableExtra::kable_styling(bootstrap_options = c("hover", "striped"), font_size = 10)
+    )
+    
+    # Render line breaks
+    cat("\n\n")
+    
+    # Render sidebar item
+    cat("### Waking hours summary")
+    cat("\n\n")
+    
+    # Filter summary_waking_hours
+    summary_waking_hours_single <- summary_waking_hours |>
+      dplyr::filter(participant_id == summary_run$participant_id[x])
+    
+    # Render summary
+    if(! nrow(summary_waking_hours_single)) {
+      cat("No data available.")
+    } else {
+      cat(
+        kableExtra::kbl(
+          x = summary_waking_hours_single |>
+            dplyr::select(
+              -summary,
+              -participant_id, 
+              -device_serial_number, 
+              -day
+            ) |>
+            dplyr::relocate(
+              participant_age,
+              day_of_week,
+              valid_day,
+              wear_time,
+              steps,
+              steps_predicted,
+              steps_lfe,
+              sb,
+              lpa,
+              mpa,
+              vpa,
+              mvpa,
+              lmvpa,
+              mpa_bouts,
+              vpa_bouts,
+              mvpa_bouts
+            ) |>
+            dplyr::mutate(
+              dplyr::across(
+                .cols = c(steps:steps_lfe),
+                .fns = ~ ifelse(
+                  test = is.na(.x),
+                  yes = "",
+                  no = format(x = as.integer(.x), big.mark = ",")
+                )
+              ),
+              dplyr::across(
+                .cols = c(wear_time, sb:mvpa_bouts),
+                .fns = ~ ifelse(
+                  test = is.na(.x),
+                  yes = "",
+                  no = format(x = round(x = .x, digits = 1), nsmall = 1, big.mark = ",")
+                )
+              ),
+              is_valid_day = dplyr::case_when(
+                valid_day == 1 ~ "&#x2705;",
+                valid_day == 0 ~ "&#x274c;",
+                TRUE ~ ""
+              )
+            ) |>
+            dplyr::rowwise() |>
+            dplyr::mutate(
+              dplyr::across(
+                .cols = day_of_week,
+                .fns = ~ ifelse(
+                  test = is.na(.x),
+                  yes = "",
+                  no = paste0(
+                    substr(
+                      x = stringr::str_split(
+                        string = .x, 
+                        pattern = "-"
+                      )[[1]], 
+                      start = 1, 
+                      stop = 3
+                    ), 
+                    collapse = "-"
+                  )
+                )
+              ),
+              dplyr::across(
+                .cols = dplyr::everything(),
+                .fns = ~ as.character(.x)
+              ),
+              dplyr::across(
+                .cols = dplyr::everything(),
+                .fns = ~ ifelse(
+                  test = sum(c(NA, ".na", "") %in% .x) > 0,
+                  yes = "&ndash;",
+                  no = .x
+                )
+              )
+            ) |>
+            dplyr::relocate(is_valid_day, .before = valid_day),
+          col.names = c(
+            "Participant age",
+            "Day",
+            "Valid",
+            "Count",
+            "Wear time (hours)",
+            "Normal",
+            "Predicted",
+            "LFE",
+            "SB",
+            "LPA",
+            "MPA",
+            "VPA",
+            "MVPA",
+            "LMVPA",
+            "MPA",
+            "VPA",
+            "MVPA"
+          ),
+          align = "c",
+          escape = FALSE
+        ) |>
+          kableExtra::kable_styling(bootstrap_options = c("hover", "striped"), font_size = 10) |>
+          kableExtra::add_header_above(c(" " = 1, "Day stats" = 3, " " = 1, "Steps" = 3, "Movement behaviours (minutes)" = 6, "Bouts (minutes)" = 3)) |>
+          kableExtra::row_spec(
+            row = summary_waking_hours_single |>
+              nrow(),
+            bold = TRUE
+          )
+      )
+    }
+    
+    # Render line breaks
+    cat("\n\n")
+    
+    # Render sidebar item
+    cat("### Sleeping hours summary")
+    cat("\n\n")
+    
+    # Filter summary_sleeping_hours
+    summary_sleeping_hours_single <- summary_sleeping_hours |>
+      dplyr::filter(participant_id == summary_run$participant_id[x])
+
+    # Render summary
+    if(! nrow(summary_sleeping_hours_single)) {
+      cat("No data available.")
+    } else {
+      cat(
+        kableExtra::kbl(
+          x = summary_sleeping_hours_single |>
+            dplyr::select(
+              participant_age,
+              day_of_week,
+              valid_day,
+              wear_time,
+              nocturnal_sleep_onset,
+              nocturnal_sleep_offset,
+              sleep_period_time,
+              total_sleep_episode_time,
+              sleep_episodes
+            ) |>
+            dplyr::mutate(
+              dplyr::across(
+                .cols = c(wear_time, sleep_period_time, total_sleep_episode_time, sleep_episodes),
+                .fns = ~ ifelse(
+                  test = is.na(.x),
+                  yes = "",
+                  no = format(x = round(x = .x, digits = 1), nsmall = 1, big.mark = ",")
+                )
+              ),
+              is_valid_day = dplyr::case_when(
+                valid_day == 1 ~ "&#x2705;",
+                valid_day == 0 ~ "&#x274c;",
+                TRUE ~ ""
+              )
+            ) |>
+            dplyr::rowwise() |>
+            dplyr::mutate(
+              dplyr::across(
+                .cols = day_of_week,
+                .fns = ~ ifelse(
+                  test = is.na(.x),
+                  yes = "",
+                  no = paste0(
+                    substr(
+                      x = stringr::str_split(
+                        string = .x,
+                        pattern = "-"
+                      )[[1]],
+                      start = 1,
+                      stop = 3
+                    ),
+                    collapse = "-"
+                  )
+                )
+              ),
+              dplyr::across(
+                .cols = dplyr::everything(),
+                .fns = ~ as.character(.x)
+              ),
+              dplyr::across(
+                .cols = dplyr::everything(),
+                .fns = ~ ifelse(
+                  test = .x %in% c(NA, "NA", ".na", ""),
+                  yes = "&ndash;",
+                  no = .x
+                )
+              ),
+              dplyr::across(
+                .cols = nocturnal_sleep_onset:nocturnal_sleep_offset,
+                .fns = ~ gsub(
+                  pattern = "NA|.na",
+                  replacement = "&ndash;",
+                  x = .x
+                )
+              )
+            ) |>
+            dplyr::relocate(is_valid_day, .before = valid_day),
+          col.names = c(
+            "Participant age",
+            "Day",
+            "Valid",
+            "Count",
+            "Wear time (hours)",
+            "Start",
+            "End",
+            "Sleep period time (hours)",
+            "Total sleep episode time (hours)",
+            "Episodes"
+          ),
+          align = "c",
+          escape = FALSE
+        ) |>
+          kableExtra::kable_styling(bootstrap_options = c("hover", "striped"), font_size = 10) |>
+          kableExtra::add_header_above(c(" " = 1, "Day stats" = 3, " " = 1, "Bedtime" = 2, "Sleep stats" = 3)) |>
+          kableExtra::row_spec(
+            row = summary_sleeping_hours_single |>
+              nrow(),
+            bold = TRUE
+          )
+      )
+    }
+
+    # Render line breaks
+    cat("\n\n")
+    
+    # Render sidebar item
+    cat("### Error check")
+    cat("\n\n")
+
+    # Render errors
+    if(! nrow(summary_waking_hours_single)) {
+      cat("No data available.")
+    } else {
+      cat(
+        kableExtra::kbl(
+          x = summary_run |>
+            dplyr::filter(participant_id == summary_run$participant_id[x]) |>
+            dplyr::select(issues) |>
+            unlist() |>
+            unname() |>
+            jsonlite::fromJSON() |>
+            dplyr::as_tibble() |>
+            dplyr::rename(
+              `None missing` = file_missing,
+              `None empty` = file_empty,
+              `Non-identical` = files_identical,
+              `None mismatched` = files_mismatched,
+              `Device initalized at midnight` = non_midnight_start,
+              `Complete days of data exist` = no_complete_days,
+              `Sleep time exists` = sleep_missing,
+              `Participant not underage` = age_out_of_range
+            ) |>
+            dplyr::mutate(
+              dplyr::across(
+                .cols = dplyr::everything(),
+                .fns = ~ ifelse(
+                  test = .x == "",
+                  yes = "&#x2705;",
+                  no = "&#x274c;"
+                )
+              )
+            ),
+          align = "c",
+          escape = FALSE
+        ) |>
+          kableExtra::kable_styling(bootstrap_options = c("hover", "striped"), font_size = 10) |>
+          kableExtra::add_header_above(c(".agd files" = 5, " " = 3))
+      )
+    }
+    
+    # If include_plots set to TRUE, render plot section
+    if(isTRUE(params$include_plot)) {
+      # Render line breaks
+      cat("\n\n")
+      
+      # Render sidebar item
+      cat("### Plot")
+      cat("\n\n")
+  
+      # Render plot
+      if(! nrow(summary_waking_hours_single)) {
+        cat("No data available.")
+      } else {
+        # Get arguments
+        args <- jsonlite::fromJSON(summary_run$args[x]) 
+        
+        # Initialize agd_worker object and run pipeline
+        agd_data <- agd_worker$new(
+          id = args$id,
+          age = args$age,
+          agd_lfe = args$agd_lfe,
+          agd_nml = args$agd_nml,
+          epoch_length = args$epoch_length,
+          day_max = args$day_max,
+          sleep_algo = args$sleep_algo,
+          non_wear_algo = args$non_wear_algo,
+          start_date = as.Date(args$start_date)
+        )$run()
+        
+        # Render plot
+        plot(x = agd_data, title_size = 7, axis_size = 5, label_size = 2.1)
+      }
+    }
+
+    # Render line breaks
+    cat("<br><br><br>")
+    cat("\n\n")
+  }
+)
+
+```

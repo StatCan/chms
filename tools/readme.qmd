@@ -1,0 +1,216 @@
+---
+title: ""
+format: gfm
+---
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>",
+  out.width = "100%",
+  eval = FALSE,
+  warning = FALSE,
+  message = TRUE
+)
+```
+
+## Overview
+
+**chms** provides tools for cleaning and summarizing accelerometer data consistent with methods applied to cycle 7 of the <a href="https://www.statcan.gc.ca/en/survey/household/5071" target="_blank">Canadian Health Measures Survey</a> (CHMS):
+
+  * `agd$new()` initializes an R6 class with fields (data) and methods (functions) for processing <a href="https://ametris.com" target="_blank">Ametris</a> (formerly ActiGraph) accelerometer data.
+  * `agd$run()` executes a pipeline that calls several methods: `$load()`, `$clean()`, `$classify()` and `$summarize()`.
+  * `agd$sanity_check()` renders an html-formatted report of summary statistics per participant.
+  
+**chms** requires:
+
+* two ActiGraph (.agd) files per participant, one processed with the normal filter (for step counts) and the other processed with the low frequency extension filter (for all other movement behaviour variables).
+* accelerometer data at the 15-second epoch level for participants &le; 17 years.
+* accelerometer data at the 60-second epoch level or lower for participants &ge; 18 years.
+* integer age of each participant.
+  
+By default, **chms**:
+
+* removes incomplete days of data (< 24 hours).
+* identifies sleep time, wear time and non-wear time by applying the <a href="https://www.pbrc.edu/pdf/PBRCSleepEpisodeTimeMacroCode.pdf" target="_blank">Barreira algorithm</a> to data at the 60-second epoch level.
+* looks for sleep bouts beginning at 6pm (3-5 years) or 7pm (6+ years).
+* identifies movement behaviours for eligible epochs (epochs previously classified as wear time and awake time) by applying the following cut-points to axis1 accelerometer counts at age-specific epoch levels:
+
+```{r, eval = TRUE, echo = FALSE}
+data.frame(
+  Age = c("3-4", "5-17", "18-64", "65+"),
+  Epoch = c(15, 15, 60, 60),
+  SB = c("0-24<sup><a href='https://pubmed.ncbi.nlm.nih.gov/18949660' target='_blank'>Evenson</a></sup>", "0-24<sup><a href='https://pubmed.ncbi.nlm.nih.gov/18949660' target='_blank'>Evenson</a></sup>", "0-99<sup><a href='https://pubmed.ncbi.nlm.nih.gov/18091006' target='_blank'>Troiano</a></sup>", "0-99<sup><a href='https://pubmed.ncbi.nlm.nih.gov/18091006' target='_blank'>Troiano</a></sup>"),
+  LPA = c("25-419<sup><a href='https://pubmed.ncbi.nlm.nih.gov/17135617' target='_blank'>Pate</a></sup>", "25-573<sup><a href='https://pubmed.ncbi.nlm.nih.gov/18949660' target='_blank'>Evenson</a></sup>", "100-2,019<sup><a href='https://pubmed.ncbi.nlm.nih.gov/18091006' target='_blank'>Troiano</a></sup>", "100-2,019<sup><a href='https://pubmed.ncbi.nlm.nih.gov/18091006' target='_blank'>Troiano</a></sup>"),
+  MPA = c("420+<sup><a href='https://pubmed.ncbi.nlm.nih.gov/17135617' target='_blank'>Pate</a></sup>", "574-1,002<sup><a href='https://pubmed.ncbi.nlm.nih.gov/18949660' target='_blank'>Evenson</a></sup>", "2,020-5,998<sup><a href='https://pubmed.ncbi.nlm.nih.gov/18091006' target='_blank'>Troiano</a></sup>", "2,020-5,998<sup><a href='https://pubmed.ncbi.nlm.nih.gov/18091006' target='_blank'>Troiano</a></sup>"),
+  VPA = c("&ndash;", "1,003+<sup><a href='https://pubmed.ncbi.nlm.nih.gov/18949660' target='_blank'>Evenson</a></sup>", "5,999+<sup><a href='https://pubmed.ncbi.nlm.nih.gov/18091006' target='_blank'>Troiano</a></sup>", "5,999+<sup><a href='https://pubmed.ncbi.nlm.nih.gov/18091006' target='_blank'>Troiano</a></sup>")
+) |>
+  dplyr::rename(
+    `Age (years)` = Age,
+    `Epoch level (seconds)` = Epoch,
+    `SB cut-point (counts)` = SB,
+    `LPA cut-point (counts)` = LPA,
+    `MPA cut-point (counts)` = MPA,
+    `VPA cut-point (counts)` = VPA
+    
+  ) |>
+  kableExtra::kbl(
+    align = "c",
+    escape = FALSE,
+    format = "markdown"
+  )
+```
+
+> **SB:** sedentary behaviour; **LPA:** light-intensity physical activity; **MPA:** moderate-intensity physical activity; **VPA:** vigorous-intensity physical activity.
+
+* validates days (&ge; 10 hours of wear time and &ge; 100 steps). Invalid days are excluded from waking hours results.
+* validates nights of sleep (&ge; 160 minutes of sleep). Invalid nights of sleep are excluded from sleeping hours results.
+
+For more details on the methods used in the **chms** R package, see Clarke J, Gribbon A, St-Laurent M, Ferrao T, Barnes J, Kuzik N, Colley R. <a href="https://www150.statcan.gc.ca/n1/pub/82-003-x/2026002/article/00001-eng.htm" target="_blank">Comparison of physical activity and sedentary time measured with the ActiGraph GT3X-BT and Actical accelerometers</a>. Health Rep. 2026 Feb 18;37(2):3-15. doi: 10.25318/82-003-x202600200001-eng. PMID: 41730515.
+
+## Installation
+
+```{r, eval = FALSE}
+remotes::install_git(
+  url = "https://github.com/statcan/chms",
+  force = TRUE,
+  upgrade = "never"
+)
+```
+
+## Usage
+
+```{r, eval = TRUE, message = FALSE}
+# Load dependencies into current R session
+library(chms)
+library(dplyr)
+```
+
+```{r, eval = TRUE}
+# Create participant meta (external/non-statcan users)
+meta <- tibble(
+  id = c("jane-canuck", "john-canuck"),
+  age = c(10, 40),
+  agd_lfe = c(
+    system.file("extdata", "jane-canuck-lfe.agd", package = "chms"),
+    system.file("extdata", "john-canuck-lfe.agd", package = "chms")
+  ),
+  agd_nml = c(
+    system.file("extdata", "jane-canuck-nml.agd", package = "chms"),
+    system.file("extdata", "john-canuck-nml.agd", package = "chms")
+  ),
+  start_date = c("2021-05-30", "2021-05-27"),
+  epoch_length = c(15, 60)
+)
+
+# Print/examine
+glimpse(meta)
+```
+
+```{r, echo = FALSE, eval = TRUE, message = FALSE}
+# Load latest dev version of chms
+devtools::load_all()
+```
+
+```{r}
+# Create participant meta (statcan users)
+meta <- get_chms_meta(
+  clinic_file = "path/to/clinic/file.sas7bdat",
+  agd_dir = "path/to/agd/files/site",
+  clinic_id = "CLINICID",
+  site = "SITE",
+  age = "CLC_AGE",
+  day = "V2_DAY",
+  month = "V2_MTH",
+  year = "V2_YEAR"
+)
+```
+
+```{r, eval = TRUE}
+# Initialize agd R6 class
+agd_data <- agd$new(
+  id = meta$id,
+  age = meta$age,
+  agd_lfe = meta$agd_lfe,
+  agd_nml = meta$agd_nml,
+  epoch_length = meta$epoch_length,
+  day_max = 7,
+  sleep_algo = "barreira",
+  non_wear_algo = "barreira",
+  start_date = meta$start_date,
+  cpu_max = 8,
+  dir = getwd()
+)
+
+# Print/examine
+agd_data
+```
+
+```{r, eval = TRUE}
+# Run processing pipeline (load, clean, classify and summarize data)
+agd_data$run()
+```
+
+```{r, eval = TRUE}
+# Export results manually
+agd_data$export(paste0(getwd(), "/my-results"))
+```
+
+```{r, eval = TRUE}
+# Export statcan-formatted results manually
+agd_data$export(getwd(), stc = TRUE)
+```
+
+```{r, eval = TRUE}
+# Get settings and pipeline run log
+agd_data
+```
+
+```{r, eval = TRUE}
+# Plot data
+plot(agd_data, id = "jane-canuck")
+```
+
+```{r, eval = TRUE}
+# Summarize data
+summary(agd_data)
+```
+
+```{r}
+# View all results in tab
+agd_data$view()
+
+# View specific results in tab
+agd_data$view("summary_full")
+agd_data$view("summary_full_stc")
+agd_data$view("summary_run")
+agd_data$view("summary_sleeping_hours")
+agd_data$view("summary_waking_hours")
+
+# View issues and run log
+agd_data$view("issues")
+agd_data$view("log")
+```
+
+```{r}
+# Store results in stand-alone data frames
+summary_full <- agd_data$results$summary_full
+summary_full_stc <- agd_data$results$summary_full_stc
+summary_run <- agd_data$results$summary_run
+summary_sleeping_hours <- agd_data$results$summary_sleeping_hours
+summary_waking_hours <- agd_data$results$summary_waking_hours
+```
+
+```{r}
+# Render sanity check report
+agd_data$sanity_check(
+  name = "My sanity check report",
+  dir = getwd()
+)
+```
+
+## Documentation
+
+```{r}
+?agd
+```

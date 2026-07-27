@@ -1,0 +1,9 @@
+.Rproj.user
+.Rhistory
+.RData
+.Ruserdata
+ignore/
+*.html
+/*.html
+config.yml
+agd-run-*

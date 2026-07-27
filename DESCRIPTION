@@ -1,0 +1,49 @@
+Package: chms
+Title: Accelerometer Processing Methods for Cycle 7 of the CHMS
+Version: 7.0
+Authors@R: c(
+    person("Joel", "Barnes", , "joel.barnes@statcan.gc.ca", role = c("aut", "cre")),
+    person("Janine", "Clarke", , "janine.clarke@statcan.gc.ca", role = "ctb"),
+    person("Rachel", "Colley", , "rachel.colley@statcan.gc.ca", role = "ctb"),
+    person("His Majesty the King in Right of Canada, as represented by Statistics Canada", role = "cph")
+  )
+Description: This package provides tools for processing accelerometer data
+    consistent with methods applied to cycle 7 of the Canadian Health
+    Measures Survey (CHMS).
+License: MIT + file LICENSE
+URL: https://github.com/statcan/chms
+BugReports: https://github.com/statcan/chms/issues
+Encoding: UTF-8
+Roxygen: list(markdown = TRUE)
+RoxygenNote: 7.3.2
+Imports: 
+    cli,
+    DBI,
+    dplyr,
+    haven,
+    hms,
+    jsonlite,
+    knitr,
+    lubridate,
+    parallel,
+    pbapply,
+    purrr,
+    R6,
+    readr,
+    rlang,
+    RSQLite,
+    stats,
+    stringr,
+    tidyr,
+    utils,
+    zoo
+Suggests: 
+    config,
+    ggplot2,
+    janitor,
+    kableExtra,
+    PhysicalActivity,
+    quarto,
+    scales,
+    testthat,
+    tibble
