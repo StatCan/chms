@@ -1,0 +1,12 @@
+bibentry(
+  header = "To cite chms in publications, please use:",
+  bibtype  = "Article",
+  title    = "Comparison of physical activity and sedentary time measured with the ActiGraph GT3X-BT and Actical accelerometers",
+  author   = "J Clarke, A Gribbon, M St-Laurent, T Ferrao, J Barnes, N Kuzik, R Colley",
+  journal  = "Health Rep",
+  year     = "2026",
+  volume   = "18",
+  number   = "37(2)",
+  pages    = "3-15",
+  doi      = "10.25318/82-003-x202600200001-eng"
+)

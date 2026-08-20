@@ -41,3 +41,31 @@ Returns the data frame \code{x} along with all vectors that were derived while a
 \description{
 This function uses the Barreira algorithm (pubmed.ncbi.nlm.nih.gov/25202840) to classify an accelerometer axis vector of 60-second epochs as sleep time or awake time. This function was validated against output from the official SAS version of the algorithm (www.pbrc.edu/pdf/PBRCSleepEpisodeTimeMacroCode.pdf).
 }
+\examples{
+\donttest{
+# Initialize agd_worker R6 class
+agd_data <- agd_worker$new(
+  id = "jane-canuck",
+  age = 10,
+  agd_lfe = system.file("extdata", "jane-canuck-lfe.agd", package = "chms"),
+  agd_nml = system.file("extdata", "jane-canuck-nml.agd", package = "chms"),
+  epoch_length = 15,
+  day_max = 7,
+  sleep_algo = "barreira",
+  non_wear_algo = "barreira"
+)
+
+# Load and clean data
+agd_data$load()$clean()
+
+# Apply Barreira sleep algorithm
+dt <- apply_barreira_algo(
+  x = agd_data$data$clean |>
+    dplyr::filter(
+      epoch_length == 60,
+      filter == "LowFrequencyExtension"
+    ),
+  age = agd_data$args$age
+)
+}
+}

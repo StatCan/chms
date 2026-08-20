@@ -9,6 +9,31 @@
 #' @param incline_lying Required (default: `"inclineLying"`): a length-one character vector representing the name of the corresponding vector in an ActiGraph `.agd` file.
 #' @param return Required (default: `"everything"`): a character vector representing which vectors to return. If set to "everything", the data frame in `x` will be returned along with all vectors that were derived while applying the Tudor-Locke algorithm.
 #' @return Returns `x` along with all vectors that were derived while applying the Tudor-Locke algorithm.
+#' @examples \donttest{
+#' # Initialize agd_worker R6 class
+#' agd_data <- agd_worker$new(
+#'   id = "jane-canuck",
+#'   age = 10,
+#'   agd_lfe = system.file("extdata", "jane-canuck-lfe.agd", package = "chms"),
+#'   agd_nml = system.file("extdata", "jane-canuck-nml.agd", package = "chms"),
+#'   epoch_length = 15,
+#'   day_max = 7,
+#'   sleep_algo = "barreira",
+#'   non_wear_algo = "barreira"
+#' )
+#'
+#' # Load and clean data
+#' agd_data$load()$clean()
+#'
+#' # Apply Tudor-Locke sleep algorithm
+#' dt <- apply_tudor_locke_algo(
+#'   x = agd_data$data$clean |>
+#'     dplyr::filter(
+#'       epoch_length == 60,
+#'       filter == "LowFrequencyExtension"
+#'     )
+#' )
+#' }
 #' @export
 
 apply_tudor_locke_algo <- function(

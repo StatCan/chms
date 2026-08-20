@@ -8,6 +8,34 @@
 #' @param max_exceptions Required: a length-one numeric vector representing the maximum number of epochs permitted within a bout that is outside the range of the values in the `target_values` argument (default: 2).
 #' @param return Required: a character vector representing which vectors to return (default: "everything"). If set to "everything", the data frame in the `x` argument will be returned along with all vectors that were derived while applying the bout algorithm.
 #' @return Returns the data frame in the `x` argument along with all vectors that were derived while applying the bout algorithm.
+#' @examples \donttest{
+#' # Initialize agd_worker R6 class
+#' agd_data <- agd_worker$new(
+#'   id = "jane-canuck",
+#'   age = 10,
+#'   agd_lfe = system.file("extdata", "jane-canuck-lfe.agd", package = "chms"),
+#'   agd_nml = system.file("extdata", "jane-canuck-nml.agd", package = "chms"),
+#'   epoch_length = 15,
+#'   day_max = 7,
+#'   sleep_algo = "barreira",
+#'   non_wear_algo = "barreira"
+#' )
+#'
+#' # Load, clean and classify data
+#' agd_data$load()$clean()$classify()
+#'
+#' # Look for 10+ minute bouts of moderate-intensity physical activity
+#' dt <- apply_general_bout_algo(
+#'   x = agd_data$data$classify,
+#'   min_bout_length = 10 * (60 / agd_data$args$movement_epoch_length),
+#'   target_values = 574:1002,
+#'   max_exceptions = 2 * (60 / agd_data$args$movement_epoch_length),
+#'   return = c("dataTimestamp", "axis1", "in_bout")
+#' )
+#'
+#' # Get bout lengths
+#' rle(dt$in_bout)
+#' }
 #' @export
 
 apply_general_bout_algo <- function(

@@ -1,18 +1,26 @@
 Package: chms
 Title: Accelerometer Processing Methods for Cycle 7 of the CHMS
-Version: 7.0
+Version: 7.1
 Authors@R: c(
     person("Joel", "Barnes", , "joel.barnes@statcan.gc.ca", role = c("aut", "cre")),
     person("Janine", "Clarke", , "janine.clarke@statcan.gc.ca", role = "ctb"),
     person("Rachel", "Colley", , "rachel.colley@statcan.gc.ca", role = "ctb"),
     person("His Majesty the King in Right of Canada, as represented by Statistics Canada", role = "cph")
   )
-Description: This package provides tools for processing accelerometer data
-    consistent with methods applied to cycle 7 of the Canadian Health
-    Measures Survey (CHMS).
+Description: 'ActiGraph wGT3X-BT' accelerometer processing methods using
+    the standardized workflow developed by Statistics Canada for cycle 7
+    of the Canadian Health Measures Survey (CHMS). The package promotes
+    transparent and reproducible data processing while supporting the
+    harmonization of analytical approaches among researchers wishing to
+    align with Statistics Canada's methods. For general details about the
+    processing methods, please consult Clarke J, Gribbon A, St-Laurent M,
+    Ferrao T, Barnes J, Kuzik N, Colley R (2026) <doi:
+    10.25318/82-003-x202600200001-eng>.
 License: MIT + file LICENSE
 URL: https://github.com/statcan/chms
 BugReports: https://github.com/statcan/chms/issues
+Depends: 
+    R (>= 4.1.0)
 Encoding: UTF-8
 Roxygen: list(markdown = TRUE)
 RoxygenNote: 7.3.2
@@ -25,8 +33,9 @@ Imports:
     jsonlite,
     knitr,
     lubridate,
-    parallel,
-    pbapply,
+    mirai,
+    mori,
+    parallelly,
     purrr,
     R6,
     readr,

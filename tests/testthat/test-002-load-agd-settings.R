@@ -1,5 +1,6 @@
 testthat::test_that("Settings table loads successfully from sample .agd file", {
   # Skip if config not found
+  testthat::skip_on_cran()
   testthat::skip_if_not(nzchar(config::get("agd_file")))
 
   # Load settings table

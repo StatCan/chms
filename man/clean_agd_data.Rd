@@ -15,3 +15,27 @@ Returns a \code{NULL} invisibly.
 \description{
 This function prepares an ActiGraph \code{.agd} file for downstream classification (e.g., remove incomplete days, aggregate data to 60-second epochs).
 }
+\examples{
+\donttest{
+# Initialize agd_worker R6 class
+agd_data <- agd_worker$new(
+  id = "jane-canuck",
+  age = 10,
+  agd_lfe = system.file("extdata", "jane-canuck-lfe.agd", package = "chms"),
+  agd_nml = system.file("extdata", "jane-canuck-nml.agd", package = "chms"),
+  epoch_length = 15,
+  day_max = 7,
+  sleep_algo = "barreira",
+  non_wear_algo = "barreira"
+)
+
+# Load data
+agd_data$load()
+
+# Clean data
+clean_agd_data(agd_data)
+
+# Store updated data
+dt <- agd_data$data$clean
+}
+}

@@ -1,32 +1,20 @@
 #' @title R6 class: `agd`
 #' @description `agd` is an R6 class that runs a data processing pipeline on one or more jobs that include two `.agd` (ActiGraph; github.com/actigraph) accelerometer files with `LowFrequencyExtension` and `Normal` filters per participant. This class makes calls to the [agd_worker] R6 class.
-#' @examples \dontrun{
+#' @examples \donttest{
 #' # Create meta data frame (external/non-statcan users)
 #' meta <- data.frame(
 #'   id = c("jane-canuck", "john-canuck"),
-#'   age = c(16, 32),
+#'   age = c(10, 40),
 #'   agd_lfe = c(
-#'     "c:/data/jane-canuck-lfe.agd",
-#'     "c:/data/john-canuck-lfe.agd"
+#'     system.file("extdata", "jane-canuck-lfe.agd", package = "chms"),
+#'     system.file("extdata", "john-canuck-lfe.agd", package = "chms")
 #'   ),
 #'   agd_nml = c(
-#'     "c:/data/jane-canuck-nml.agd",
-#'     "c:/data/john-canuck-nml.agd"
+#'     system.file("extdata", "jane-canuck-nml.agd", package = "chms"),
+#'     system.file("extdata", "john-canuck-nml.agd", package = "chms")
 #'   ),
-#'   start_date = c("2026-06-01", "2026-06-01"),
+#'   start_date = c("2021-05-30", "2021-05-27"),
 #'   epoch_length = c(15, 60)
-#' )
-#'
-#' # Create meta data frame (statcan users)
-#' meta <- get_chms_meta(
-#'   clinic_file = "path/to/clinic/file.sas7bat",
-#'   agd_dir = "path/to/agd/files/site",
-#'   clinic_id = "CLINICID",
-#'   site = "SITE",
-#'   age = "CLC_AGE",
-#'   day = "V2_DAY",
-#'   month = "V2_MTH",
-#'   year = "V2_YEAR"
 #' )
 #'
 #' # Initialize agd R6 class
@@ -40,8 +28,7 @@
 #'   sleep_algo = "barreira",
 #'   non_wear_algo = "barreira",
 #'   start_date = meta$start_date,
-#'   cpu_max = 8,
-#'   dir = "path/to/save/results"
+#'   cpu_max = 2
 #' )
 #'
 #' # Run data processing pipeline (load, clean, classify and summarize data)
@@ -59,7 +46,6 @@
 #' # Render sanity check report
 #' agd_data$sanity_check(
 #'   name = "My sanity check report",
-#'   dir = "/path/to/save/report",
 #'   include_plot = FALSE
 #' )
 #' }
@@ -91,7 +77,7 @@ agd <- R6::R6Class(
     #' @param non_wear_algo Required (default: `"barreira"`): a character vector (length-one or the same length as `id`) representing the non-wear algorithm to apply. Options currently include `"barreira"`, `"20-min-algo"`, `"60-min-algo"`, `"90-min-algo"` and `"choi"`. See [apply_barreira_algo()] and [apply_non_wear_algo()] for more details.
     #' @param start_date Optional: a character or date vector (format: yyyy-mm-dd) that is length-one or the same length as `id` representing the first day of data to load from `agd_lfe` and `agd_nml`. If not set, data will be loaded from the first available day until `day_max` is reached.
     #' @param cpu_max Required (default: `1`): a length-one integer vector representing the number of CPUs to distribute the data processing across.
-    #' @param dir Optional (default: `getwd()`): a length-one character vector representing the full path to the location where the `results` list will be exported tibble by tibble in `.csv` format.
+    #' @param dir Optional (default: `tempdir()`): a length-one character vector representing the full path to the location where the `results` list will be exported tibble by tibble in `.csv` format.
     #' @param ... Optional: all other arguments are currently ignored.
     #' @return Returns an object of class `agd`.
 
@@ -106,7 +92,7 @@ agd <- R6::R6Class(
       non_wear_algo = "barreira",
       start_date,
       cpu_max = 1,
-      dir = getwd(),
+      dir = tempdir(),
       ...
     ) {
       # Update log
@@ -116,7 +102,7 @@ agd <- R6::R6Class(
       self$args <- as.list(environment())
       self$args$id = as.character(self$args$id)
       if(rlang::is_symbol(self$args$start_date)) self$args$start_date <- NA
-      if(class(self$args$start_date) == "character") self$args$start_date <- suppressWarnings(as.Date(self$args$start_date))
+      if(inherits(self$args$start_date, "character")) self$args$start_date <- suppressWarnings(as.Date(self$args$start_date))
       if(rlang::is_symbol(self$args$dir) | suppressWarnings(is.na(self$args$dir))) self$args$dir <- ""
       self$args$self <- NULL
 
@@ -138,8 +124,8 @@ agd <- R6::R6Class(
         start_date = self$args$start_date
       )
 
-      # Update cpu_max if greater than jobs
-      self$args$cpu_max <- min(self$args$cpu_max, nrow(self$jobs))
+      # Update cpu_max if greater than jobs or available CPUs
+      self$args$cpu_max <- min(self$args$cpu_max, nrow(self$jobs), parallelly::availableCores())
 
       # Exit
       return(invisible(self))
@@ -154,7 +140,7 @@ agd <- R6::R6Class(
         expr = {
           # Render message to console
           cli::cli_h2(paste0(private$red("\U1F341"), private$black("{.emph chms::agd$run()} method")))
-          cli::cli_alert_info("Crunching data for {nrow(self$jobs)} participant{?s} across {min(self$args$cpu_max, parallel::detectCores())} CPU{?s}.")
+          cli::cli_alert_info("Crunching data for {nrow(self$jobs)} participant{?s} across {self$args$cpu_max} CPU{?s}.")
           cli::cli_text("")
 
           # Iterate jobs
@@ -436,71 +422,71 @@ agd <- R6::R6Class(
       report_name_qmd <- paste0(name, ".qmd")
       report_name_html <- paste0(name, ".html")
 
-      # Copy quarto doc to working directory (for now)
+      # Copy quarto doc to temp directory (for now)
       copy_file <- file.copy(
         from = system.file("qmd", "sanity-check-report.qmd", package = "chms"),
-        to = paste0(getwd(), "/", report_name_qmd),
+        to = paste0(tempdir(), "/", report_name_qmd),
         overwrite = TRUE
       )
 
       # Render message to console
       cli::cli_text("Rendering sanity check report in .html format.")
 
-      # Temporarily save parameters to working directory
+      # Temporarily save parameters to temp directory
       timestamp <- gsub(" |[:]|[.]|-", "_", Sys.time())
       dir.create(
-        path = paste0(getwd(), "/agd-temp/sanity-check-params/"),
+        path = paste0(tempdir(), "/agd-temp/sanity-check-params/"),
         showWarnings = FALSE,
         recursive = TRUE
       )
       saveRDS(
         object = self$results$summary_run,
-        file = paste0(getwd(), "/agd-temp/sanity-check-params/summary-run.rds")
+        file = paste0(tempdir(), "/agd-temp/sanity-check-params/summary-run.rds")
       )
       saveRDS(
         object = self$results$summary_waking_hours,
-        file = paste0(getwd(), "/agd-temp/sanity-check-params/summary-waking-hours.rds")
+        file = paste0(tempdir(), "/agd-temp/sanity-check-params/summary-waking-hours.rds")
       )
       saveRDS(
         object = self$results$summary_sleeping_hours,
-        file = paste0(getwd(), "/agd-temp/sanity-check-params/summary-sleeping-hours.rds")
+        file = paste0(tempdir(), "/agd-temp/sanity-check-params/summary-sleeping-hours.rds")
       )
 
       # Render Quarto doc
       quarto::quarto_render(
         input = paste0(
-          getwd(),
+          tempdir(),
           "/",
           report_name_qmd
         ),
         execute_params = list(
-          summary_run = paste0(getwd(), "/agd-temp/sanity-check-params/summary-run.rds"),
-          summary_waking_hours = paste0(getwd(), "/agd-temp/sanity-check-params/summary-waking-hours.rds"),
-          summary_sleeping_hours = paste0(getwd(), "/agd-temp/sanity-check-params/summary-sleeping-hours.rds"),
+          summary_run = paste0(tempdir(), "/agd-temp/sanity-check-params/summary-run.rds"),
+          summary_waking_hours = paste0(tempdir(), "/agd-temp/sanity-check-params/summary-waking-hours.rds"),
+          summary_sleeping_hours = paste0(tempdir(), "/agd-temp/sanity-check-params/summary-sleeping-hours.rds"),
           include_plot = include_plot
         )
       )
 
       # Remove parameters from temporary storage
       unlink(
-        x = paste0(getwd(), "/agd-temp"),
+        x = paste0(tempdir(), "/agd-temp"),
         recursive = TRUE
       )
 
       # Remove qmd file
       remove_file <- file.remove(
         paste0(
-          getwd(),
+          tempdir(),
           "/",
           report_name_qmd
         )
       )
 
       # Copy quarto doc to dir
-      if(dir != getwd()) {
+      if(dir != tempdir()) {
         # Copy file
         copy_file <- file.copy(
-          from = paste0(getwd(), "/", report_name_html),
+          from = paste0(tempdir(), "/", report_name_html),
           to = paste0(dir, "/", report_name_html),
           overwrite = TRUE
         )
@@ -508,7 +494,7 @@ agd <- R6::R6Class(
         # Remove file from working directory
         remove_file <- file.remove(
           paste0(
-            getwd(),
+            tempdir(),
             "/",
             report_name_html
           )
@@ -580,55 +566,26 @@ agd <- R6::R6Class(
     black = function(x) cli::make_ansi_style("#000000")(x),
     red = function(x) cli::make_ansi_style("#af3c43")(x),
     run_in_parallel = function(jobs, cpu_max) {
-      # Create a cluster
-      cluster <- parallel::makeCluster(cpu_max)
+      # Start workers
+      mirai::daemons(cpu_max)
 
-      # Make objects available to the nodes in the cluster
-      parallel::clusterExport(
-        cl = cluster,
-        varlist = c("jobs"),
-        envir = environment()
-      )
-
-      # Make packages available to the nodes in the cluster
-      invisible(
-        parallel::clusterEvalQ(
-          cl = cluster,
-          expr = {
-            # Load dependencies
-            library(chms)
-            library(cli)
-            library(DBI)
-            library(dplyr)
-            library(haven)
-            library(jsonlite)
-            library(knitr)
-            library(lubridate)
-            library(parallel)
-            library(pbapply)
-            library(purrr)
-            library(R6)
-            library(readr)
-            library(rlang)
-            library(RSQLite)
-            library(stats)
-            library(stringr)
-            library(tidyr)
-            library(utils)
-            library(zoo)
-          }
-        )
-      )
+      # Load chms on all daemons
+      mirai::everywhere(library(chms))
 
       # Iterate jobs
-      results <- pbapply::pblapply(
-        cl = cluster,
-        X = 1:nrow(jobs),
-        FUN = function(x) run_agd_job(jobs[x,])
-      )
+      results <- mirai::mirai_map(
+        .x = 1:nrow(jobs),
+        .f = function(x, jobs, run_agd_job) {
+          run_agd_job(jobs[x,])
+        },
+        .args = list(
+          jobs = mori::share(jobs),
+          run_agd_job = mori::share(chms::run_agd_job)
+        )
+      )[.progress]
 
-      # Stop the cluster
-      suppressWarnings(parallel::stopCluster(cluster))
+      # Stop workers
+      mirai::daemons(0)
 
       # Exit
       return(results)

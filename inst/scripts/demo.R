@@ -39,8 +39,7 @@ agd_data <- agd$new(
   sleep_algo = "barreira",
   non_wear_algo = "barreira",
   start_date = meta$start_date,
-  cpu_max = 8,
-  dir = getwd()
+  cpu_max = 2
 )
 
 # Print/examine
@@ -50,10 +49,10 @@ agd_data
 agd_data$run()
 
 # Export results manually
-agd_data$export(paste0(getwd(), "/my-results"))
+agd_data$export()
 
 # Export statcan-formatted results manually
-agd_data$export(paste0(getwd(), "/my-results"), stc = TRUE)
+agd_data$export(stc = TRUE)
 
 # Get settings and pipeline run log
 agd_data
@@ -86,7 +85,4 @@ summary_sleeping_hours <- agd_data$results$summary_sleeping_hours
 summary_waking_hours <- agd_data$results$summary_waking_hours
 
 # Render sanity check report
-agd_data$sanity_check(
-  name = "My sanity check report",
-  dir = getwd()
-)
+agd_data$sanity_check(name = "My sanity check report")

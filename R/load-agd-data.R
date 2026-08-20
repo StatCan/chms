@@ -6,6 +6,25 @@
 #' @param start_date Optional: a length-one date vector (format: yyyy-mm-dd) representing the first day of data to load from `file`. If not set, data will be loaded from the first available day until `day_max` is reached.
 #' @param settings Optional: a tibble from `file` previously returned from [load_agd_settings()].
 #' @return Returns a tibble of the `data` table.
+#' @examples \donttest{
+#' # Initialize agd_worker R6 class
+#' agd_data <- agd_worker$new(
+#'   id = "jane-canuck",
+#'   age = 10,
+#'   agd_lfe = system.file("extdata", "jane-canuck-lfe.agd", package = "chms"),
+#'   agd_nml = system.file("extdata", "jane-canuck-nml.agd", package = "chms"),
+#'   epoch_length = 15,
+#'   day_max = 7,
+#'   sleep_algo = "barreira",
+#'   non_wear_algo = "barreira"
+#' )
+#'
+#' # Load data with low frequency extension
+#' dt <- load_agd_data(
+#'   file = agd_data$args$agd_lfe,
+#'   start_date = agd_data$args$start_date
+#' )
+#' }
 #' @export
 
 load_agd_data <- function(file, col_select = "everything", day_max = 7, start_date, settings) {

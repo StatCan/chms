@@ -7,20 +7,20 @@
 \code{agd_worker} is an R6 class that runs a data processing pipeline on two \code{.agd} (ActiGraph; github.com/actigraph) accelerometer files with \code{LowFrequencyExtension} and \code{Normal} filters for a single participant. This class does all the heavy lifting for the \link{agd} R6 class.
 }
 \examples{
-\dontrun{
-# Instantiate agd_worker class
+\donttest{
+# Initialize agd_worker R6 class
 agd_data <- agd_worker$new(
-  id = "johny-canuck",
-  age = 45,
-  agd_lfe = "c:/jc-lfe.agd",
-  agd_nml = "c:/jc-nml.agd",
-  epoch_length = 60,
+  id = "jane-canuck",
+  age = 10,
+  agd_lfe = system.file("extdata", "jane-canuck-lfe.agd", package = "chms"),
+  agd_nml = system.file("extdata", "jane-canuck-nml.agd", package = "chms"),
+  epoch_length = 15,
   day_max = 7,
   sleep_algo = "barreira",
   non_wear_algo = "barreira"
 )
 
-# Process data
+# Run data processing pipeline (load, clean, classify and summarize data)
 agd_data$run()
 }
 }

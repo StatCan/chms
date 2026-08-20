@@ -1,5 +1,6 @@
 test_that("ActiGraph data successfully processes", {
   # Skip if configs not found
+  testthat::skip_on_cran()
   testthat::skip_if_not(nzchar(config::get("cycle7_agd_dir")))
   testthat::skip_if_not(nzchar(config::get("cycle7_clinic_file")))
 
@@ -21,8 +22,7 @@ test_that("ActiGraph data successfully processes", {
     sleep_algo = "barreira",
     non_wear_algo = "barreira",
     start_date = meta$start_date,
-    cpu_max = 15,
-    dir = getwd()
+    cpu_max = 15
   )
 
   # Run processing pipeline (load, clean, classify and summarize data)

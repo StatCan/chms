@@ -2,9 +2,9 @@
 usethis::use_description(
   fields = list(
     Package = "chms",
-    Version = "7.0",
+    Version = "7.1",
     Title = "Accelerometer Processing Methods for Cycle 7 of the CHMS",
-    Description = "This package provides tools for processing accelerometer data consistent with methods applied to cycle 7 of the Canadian Health Measures Survey (CHMS).",
+    Description = "'ActiGraph wGT3X-BT' accelerometer processing methods using the standardized workflow developed by Statistics Canada for cycle 7 of the Canadian Health Measures Survey (CHMS). The package promotes transparent and reproducible data processing while supporting the harmonization of analytical approaches among researchers wishing to align with Statistics Canada's methods. For general details about the processing methods, please consult Clarke J, Gribbon A, St-Laurent M, Ferrao T, Barnes J, Kuzik N, Colley R (2026) <doi: 10.25318/82-003-x202600200001-eng>.",
     `Authors@R` = c(
       utils::person(
         given = "Joel",
@@ -31,7 +31,8 @@ usethis::use_description(
     ),
     License = "MIT",
     URL = "https://github.com/statcan/chms",
-    BugReports = "https://github.com/statcan/chms/issues"
+    BugReports = "https://github.com/statcan/chms/issues",
+    Depends = "R (>= 4.1.0)"
   )
 )
 
@@ -48,8 +49,9 @@ usethis::use_package("jsonlite", "Imports")
 usethis::use_package("kableExtra", "Suggests")
 usethis::use_package("knitr", "Imports")
 usethis::use_package("lubridate", "Imports")
-usethis::use_package("parallel", "Imports")
-usethis::use_package("pbapply", "Imports")
+usethis::use_package("mirai", "Imports")
+usethis::use_package("mori", "Imports")
+usethis::use_package("parallelly", "Imports")
 usethis::use_package("PhysicalActivity", "Suggests")
 usethis::use_package("purrr", "Imports")
 usethis::use_package("quarto", "Suggests")
@@ -66,14 +68,14 @@ usethis::use_package("tidyr", "Imports")
 usethis::use_package("utils", "Imports")
 usethis::use_package("zoo", "Imports")
 
+# Create citation file
+usethis::use_citation()
+
 # Create NAMESPACE file
 usethis::use_namespace()
 
 # Create license
 usethis::use_mit_license(copyright_holder = "His Majesty the King in Right of Canada, as represented by Statistics Canada")
-
-# Remove LICENSE
-unlink("LICENSE")
 
 # Create tests folder
 usethis::use_testthat()
@@ -100,3 +102,12 @@ devtools::check_man()
 
 # Check package build
 devtools::check()
+
+# Run R CMD check
+rcmdcheck::rcmdcheck(args = "--as-cran")
+
+# Check with CRAN's incoming checks
+urlchecker::url_check()
+
+# Build package
+devtools::build()

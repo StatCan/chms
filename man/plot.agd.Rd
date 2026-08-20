@@ -4,10 +4,12 @@
 \alias{plot.agd}
 \title{Plot method for the \link{agd} R6 class.}
 \usage{
-\method{plot}{agd}(x, id)
+\method{plot}{agd}(x, ..., id)
 }
 \arguments{
 \item{x}{Required: an \link{agd} object.}
+
+\item{...}{Optional: arguments to be passed to methods. \strong{Note:} currently not used.}
 
 \item{id}{Optional: a vector representing participant IDs in \code{x} for which to render scatter plots. If \code{id} is unset, scatter plots for all participants in \code{x} will be rendered iteratively.}
 }
@@ -16,4 +18,44 @@ Returns \code{ggplot2} objects invisibly.
 }
 \description{
 This method renders scatter plots iteratively and interactively using results from an \link{agd} object.
+}
+\examples{
+\donttest{
+# Create meta data frame (external/non-statcan users)
+meta <- data.frame(
+  id = c("jane-canuck", "john-canuck"),
+  age = c(10, 40),
+  agd_lfe = c(
+    system.file("extdata", "jane-canuck-lfe.agd", package = "chms"),
+    system.file("extdata", "john-canuck-lfe.agd", package = "chms")
+  ),
+  agd_nml = c(
+    system.file("extdata", "jane-canuck-nml.agd", package = "chms"),
+    system.file("extdata", "john-canuck-nml.agd", package = "chms")
+  ),
+  start_date = c("2021-05-30", "2021-05-27"),
+  epoch_length = c(15, 60)
+)
+
+# Initialize agd R6 class
+agd_data <- agd$new(
+  id = meta$id,
+  age = meta$age,
+  agd_lfe = meta$agd_lfe,
+  agd_nml = meta$agd_nml,
+  epoch_length = meta$epoch_length,
+  day_max = 7,
+  sleep_algo = "barreira",
+  non_wear_algo = "barreira",
+  start_date = meta$start_date,
+  cpu_max = 2
+)
+
+# Run data processing pipeline (load, clean, classify and summarize data)
+agd_data$run()
+
+# Plot data
+plot(agd_data)
+
+}
 }

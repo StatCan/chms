@@ -1,5 +1,6 @@
 test_that("Barreira algo in R matches Barreira algo in SAS", {
   # Skip if configs not found
+  testthat::skip_on_cran()
   testthat::skip_if_not(nzchar(config::get("cycle7_clinic_file")))
   testthat::skip_if_not(nzchar(config::get("cycle7_site2_agd_dir_lfe")))
   testthat::skip_if_not(nzchar(config::get("cycle7_site2_agd_dir_nml")))
@@ -175,8 +176,7 @@ test_that("Barreira algo in R matches Barreira algo in SAS", {
     sleep_algo = "barreira",
     non_wear_algo = "barreira",
     start_date = meta$start_date,
-    cpu_max = 15,
-    dir = getwd()
+    cpu_max = 15
   )
 
   # Run processing pipeline (load, clean, classify and summarize data)

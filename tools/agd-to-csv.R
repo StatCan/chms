@@ -39,13 +39,13 @@ for(i in 1:nrow(meta)) {
       # Write to file locally
       readr::write_csv(
         x = agd_data,
-        file = paste0(getwd(), "/", file_name),
+        file = paste0(tempdir(), "/", file_name),
         na = ""
       )
 
       # Move file to remote location
       file.rename(
-        from = paste0(getwd(), "/", file_name),
+        from = paste0(tempdir(), "/", file_name),
         to = paste0(dirname(meta$agd_lfe[i]), "/", file_name)
       )
     }

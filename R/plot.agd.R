@@ -1,12 +1,51 @@
 #' @title Plot method for the [agd] R6 class.
 #' @description This method renders scatter plots iteratively and interactively using results from an [agd] object.
 #' @param x Required: an [agd] object.
+#' @param ... Optional: arguments to be passed to methods. **Note:** currently not used.
 #' @param id Optional: a vector representing participant IDs in `x` for which to render scatter plots. If `id` is unset, scatter plots for all participants in `x` will be rendered iteratively.
 #' @return Returns `ggplot2` objects invisibly.
 #' @method plot agd
+#' @examples \donttest{
+#' # Create meta data frame (external/non-statcan users)
+#' meta <- data.frame(
+#'   id = c("jane-canuck", "john-canuck"),
+#'   age = c(10, 40),
+#'   agd_lfe = c(
+#'     system.file("extdata", "jane-canuck-lfe.agd", package = "chms"),
+#'     system.file("extdata", "john-canuck-lfe.agd", package = "chms")
+#'   ),
+#'   agd_nml = c(
+#'     system.file("extdata", "jane-canuck-nml.agd", package = "chms"),
+#'     system.file("extdata", "john-canuck-nml.agd", package = "chms")
+#'   ),
+#'   start_date = c("2021-05-30", "2021-05-27"),
+#'   epoch_length = c(15, 60)
+#' )
+#'
+#' # Initialize agd R6 class
+#' agd_data <- agd$new(
+#'   id = meta$id,
+#'   age = meta$age,
+#'   agd_lfe = meta$agd_lfe,
+#'   agd_nml = meta$agd_nml,
+#'   epoch_length = meta$epoch_length,
+#'   day_max = 7,
+#'   sleep_algo = "barreira",
+#'   non_wear_algo = "barreira",
+#'   start_date = meta$start_date,
+#'   cpu_max = 2
+#' )
+#'
+#' # Run data processing pipeline (load, clean, classify and summarize data)
+#' agd_data$run()
+#'
+#' # Plot data
+#' plot(agd_data)
+#'
+#' }
 #' @export
 
-plot.agd <- function(x, id) {
+plot.agd <- function(x, ..., id) {
   # Render messages to console
   cli::cli_h2(paste0(cli::make_ansi_style("#af3c43")("\U1F341"), cli::make_ansi_style("#000000")("{.emph chms::plot(agd)} method")))
 
@@ -44,7 +83,7 @@ plot.agd <- function(x, id) {
     if(i > 1) cli::cli_text("")
     cli::cli_alert_info("Rendering scatter plot for participant {.var {jobs$id[i]}}")
 
-    # Instantiate agd_worker and run pipeline
+    # Initialize agd_worker and run pipeline
     agd_data <- agd_worker$new(
       id = jobs$id[i],
       age = jobs$age[i],

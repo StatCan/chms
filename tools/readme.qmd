@@ -14,6 +14,10 @@ knitr::opts_chunk$set(
 )
 ```
 
+<details open>
+
+<summary>English</summary>
+
 ## Overview
 
 **chms** provides tools for cleaning and summarizing accelerometer data consistent with methods applied to cycle 7 of the <a href="https://www.statcan.gc.ca/en/survey/household/5071" target="_blank">Canadian Health Measures Survey</a> (CHMS):
@@ -40,10 +44,10 @@ By default, **chms**:
 data.frame(
   Age = c("3-4", "5-17", "18-64", "65+"),
   Epoch = c(15, 15, 60, 60),
-  SB = c("0-24<sup><a href='https://pubmed.ncbi.nlm.nih.gov/18949660' target='_blank'>Evenson</a></sup>", "0-24<sup><a href='https://pubmed.ncbi.nlm.nih.gov/18949660' target='_blank'>Evenson</a></sup>", "0-99<sup><a href='https://pubmed.ncbi.nlm.nih.gov/18091006' target='_blank'>Troiano</a></sup>", "0-99<sup><a href='https://pubmed.ncbi.nlm.nih.gov/18091006' target='_blank'>Troiano</a></sup>"),
-  LPA = c("25-419<sup><a href='https://pubmed.ncbi.nlm.nih.gov/17135617' target='_blank'>Pate</a></sup>", "25-573<sup><a href='https://pubmed.ncbi.nlm.nih.gov/18949660' target='_blank'>Evenson</a></sup>", "100-2,019<sup><a href='https://pubmed.ncbi.nlm.nih.gov/18091006' target='_blank'>Troiano</a></sup>", "100-2,019<sup><a href='https://pubmed.ncbi.nlm.nih.gov/18091006' target='_blank'>Troiano</a></sup>"),
-  MPA = c("420+<sup><a href='https://pubmed.ncbi.nlm.nih.gov/17135617' target='_blank'>Pate</a></sup>", "574-1,002<sup><a href='https://pubmed.ncbi.nlm.nih.gov/18949660' target='_blank'>Evenson</a></sup>", "2,020-5,998<sup><a href='https://pubmed.ncbi.nlm.nih.gov/18091006' target='_blank'>Troiano</a></sup>", "2,020-5,998<sup><a href='https://pubmed.ncbi.nlm.nih.gov/18091006' target='_blank'>Troiano</a></sup>"),
-  VPA = c("&ndash;", "1,003+<sup><a href='https://pubmed.ncbi.nlm.nih.gov/18949660' target='_blank'>Evenson</a></sup>", "5,999+<sup><a href='https://pubmed.ncbi.nlm.nih.gov/18091006' target='_blank'>Troiano</a></sup>", "5,999+<sup><a href='https://pubmed.ncbi.nlm.nih.gov/18091006' target='_blank'>Troiano</a></sup>")
+  SB = c("0-24<sup><a href='https://doi.org/10.1080/02640410802334196' target='_blank'>Evenson</a></sup>", "0-24<sup><a href='https://doi.org/10.1080/02640410802334196' target='_blank'>Evenson</a></sup>", "0-99<sup><a href='https://doi.org/10.1249/mss.0b013e31815a51b3' target='_blank'>Troiano</a></sup>", "0-99<sup><a href='https://doi.org/10.1249/mss.0b013e31815a51b3' target='_blank'>Troiano</a></sup>"),
+  LPA = c("25-419<sup><a href='https://doi.org/10.1038/oby.2006.234' target='_blank'>Pate</a></sup>", "25-573<sup><a href='https://doi.org/10.1080/02640410802334196' target='_blank'>Evenson</a></sup>", "100-2,019<sup><a href='https://doi.org/10.1249/mss.0b013e31815a51b3' target='_blank'>Troiano</a></sup>", "100-2,019<sup><a href='https://doi.org/10.1249/mss.0b013e31815a51b3' target='_blank'>Troiano</a></sup>"),
+  MPA = c("420+<sup><a href='https://doi.org/10.1038/oby.2006.234' target='_blank'>Pate</a></sup>", "574-1,002<sup><a href='https://doi.org/10.1080/02640410802334196' target='_blank'>Evenson</a></sup>", "2,020-5,998<sup><a href='https://doi.org/10.1249/mss.0b013e31815a51b3' target='_blank'>Troiano</a></sup>", "2,020-5,998<sup><a href='https://doi.org/10.1249/mss.0b013e31815a51b3' target='_blank'>Troiano</a></sup>"),
+  VPA = c("&ndash;", "1,003+<sup><a href='https://doi.org/10.1080/02640410802334196' target='_blank'>Evenson</a></sup>", "5,999+<sup><a href='https://doi.org/10.1249/mss.0b013e31815a51b3' target='_blank'>Troiano</a></sup>", "5,999+<sup><a href='https://doi.org/10.1249/mss.0b013e31815a51b3' target='_blank'>Troiano</a></sup>")
 ) |>
   dplyr::rename(
     `Age (years)` = Age,
@@ -138,8 +142,7 @@ agd_data <- agd$new(
   sleep_algo = "barreira",
   non_wear_algo = "barreira",
   start_date = meta$start_date,
-  cpu_max = 8,
-  dir = getwd()
+  cpu_max = 2
 )
 
 # Print/examine
@@ -153,12 +156,12 @@ agd_data$run()
 
 ```{r, eval = TRUE}
 # Export results manually
-agd_data$export(paste0(getwd(), "/my-results"))
+agd_data$export("my-results")
 ```
 
 ```{r, eval = TRUE}
 # Export statcan-formatted results manually
-agd_data$export(getwd(), stc = TRUE)
+agd_data$export(stc = TRUE)
 ```
 
 ```{r, eval = TRUE}
@@ -203,10 +206,7 @@ summary_waking_hours <- agd_data$results$summary_waking_hours
 
 ```{r}
 # Render sanity check report
-agd_data$sanity_check(
-  name = "My sanity check report",
-  dir = getwd()
-)
+agd_data$sanity_check(name = "My sanity check report")
 ```
 
 ## Documentation
@@ -214,3 +214,226 @@ agd_data$sanity_check(
 ```{r}
 ?agd
 ```
+
+## How to cite
+
+```{r, eval = TRUE}
+citation("chms")
+```
+
+</details>
+
+<hr style="border: 3px solid grey; height: 4px">
+
+<details open>
+
+<summary>Français</summary>
+
+## Vue d'ensemble
+
+**L'ECMS** fournit des outils pour nettoyer et résumer les données de l'accéléromètre conforme aux méthodes appliquées au cycle 7 du <a href="https://www.statcan.gc.ca/fr/enquete/menages/5071" target="_blank">Enquête canadienne sur les mesures de la santé</a> (ECMS) :
+
+- `agd$new()` initialise une classe R6 avec des champs (données) et des méthodes (fonctions) pour le traitement
+  <a href="https://ametris.com" target="_blank">Ametris</a> (anciennement ActiGraph).
+- `agd$run()` exécute un pipeline qui appelle plusieurs méthodes : `$load()`, `$clean()`, `$classify()` et `$summarize()`.
+- `agd$sanity_check()` Affiche un rapport de résumé au format HTML statistiques par participant.
+
+**L'ECMS** exige :
+
+- deux fichiers ActiGraph (.agd) par participant, dont un traité avec le filtre normal (pour le nombre de pas) et l'autre traité avec le filtre faible Filtre d'extension de fréquence (pour tous les autres comportements de mouvement variables).
+- données de l'accéléromètre au niveau de l'époque de 15 secondes pour les participants &le; 17 ans.
+- les données de l'accéléromètre au niveau de l'époque de 60 secondes ou moins pour participants &ge; 18 ans.
+- âge entier de chaque participant.
+
+Par défaut, **l'ECMS** :
+
+- supprime les jours incomplets de données (&lt; 24 heures).
+- détermine le temps de sommeil, le temps de port et le temps de non-port en appliquant le <a href="https://www.pbrc.edu/pdf/PBRCSleepEpisodeTimeMacroCode.pdf" target="_blank">Barreira algorithme</a> aux données au niveau de l'époque de 60 secondes.
+- recherche des périodes de sommeil à partir de 18 h (3 à 5 ans) ou de 19 h (6 ans et +).
+- détermine les comportements de mouvement pour les époques admissibles (époques antérieures classé comme temps de port et temps d'éveil) en appliquant ce qui suit Points de coupure du nombre d'accéléromètres de l'axe 1 à des niveaux d'époque spécifiques à l'âge :
+
+```{r, eval = TRUE, echo = FALSE}
+data.frame(
+  Age = c("3-4", "5-17", "18-64", "65+"),
+  Epoch = c(15, 15, 60, 60),
+  SB = c("0-24<sup><a href='https://doi.org/10.1080/02640410802334196' target='_blank'>Evenson</a></sup>", "0-24<sup><a href='https://doi.org/10.1080/02640410802334196' target='_blank'>Evenson</a></sup>", "0-99<sup><a href='https://doi.org/10.1249/mss.0b013e31815a51b3' target='_blank'>Troiano</a></sup>", "0-99<sup><a href='https://doi.org/10.1249/mss.0b013e31815a51b3' target='_blank'>Troiano</a></sup>"),
+  LPA = c("25-419<sup><a href='https://doi.org/10.1038/oby.2006.234' target='_blank'>Pate</a></sup>", "25-573<sup><a href='https://doi.org/10.1080/02640410802334196' target='_blank'>Evenson</a></sup>", "100-2,019<sup><a href='https://doi.org/10.1249/mss.0b013e31815a51b3' target='_blank'>Troiano</a></sup>", "100-2,019<sup><a href='https://doi.org/10.1249/mss.0b013e31815a51b3' target='_blank'>Troiano</a></sup>"),
+  MPA = c("420+<sup><a href='https://doi.org/10.1038/oby.2006.234' target='_blank'>Pate</a></sup>", "574-1,002<sup><a href='https://doi.org/10.1080/02640410802334196' target='_blank'>Evenson</a></sup>", "2,020-5,998<sup><a href='https://doi.org/10.1249/mss.0b013e31815a51b3' target='_blank'>Troiano</a></sup>", "2,020-5,998<sup><a href='https://doi.org/10.1249/mss.0b013e31815a51b3' target='_blank'>Troiano</a></sup>"),
+  VPA = c("&ndash;", "1,003+<sup><a href='https://doi.org/10.1080/02640410802334196' target='_blank'>Evenson</a></sup>", "5,999+<sup><a href='https://doi.org/10.1249/mss.0b013e31815a51b3' target='_blank'>Troiano</a></sup>", "5,999+<sup><a href='https://doi.org/10.1249/mss.0b013e31815a51b3' target='_blank'>Troiano</a></sup>")
+) |>
+  dplyr::rename(
+    `Âge (années)` = Age,
+    `Niveau d'époque (secondes)` = Epoch,
+    `Point de coupure de SB (nombres)` = SB,
+    `Point de coupure de l'APL (nombre)` = LPA,
+    `Point de coupure de l'AMP (nombre)` = MPA,
+    `Seuil de l'APV (nombre)` = VPA
+  ) |>
+  kableExtra::kbl(
+    align = "c",
+    escape = FALSE,
+    format = "markdown"
+  )
+```
+
+> **SB :** comportement sédentaire ; **APL :** physique d'intensité légère activité ; **APM :** activité physique d'intensité modérée ; **APV :** activité physique d'intensité vigoureuse.
+
+- valide les jours (&ge; 10 heures de port et &ge; 100 pas). Jours invalides
+  sont exclus des résultats des heures d'éveil.
+- valide les nuits de sommeil (≥ 160 minutes de sommeil). Nuits invalides de
+  le sommeil sont exclus des résultats des heures de sommeil.
+
+Pour plus de détails sur les méthodes utilisées dans l'ensemble R de l' **ECMS** , voir
+Clarke J, Gribbon A, St-Laurent M, Ferrao T, Barnes J, Kuzik N, Colley
+R. <a href="https://www150.statcan.gc.ca/n1/pub/82-003-x/2026002/article/00001-fra.htm" target="_blank">Comparaison de l’activité physique et du temps consacré à des activités sédentaires mesurés à l’aide des accéléromètres ActiGraph GT3X-BT et Actical</a>. Représentant de la santé 2026 févr. 18; 37(2):3-15. DOI : 10.25318/82-003-x202600200001-fra. PMID : 41730515.
+
+## L'installation
+
+```{r, eval = FALSE}
+remotes::install_git(
+  url = "https://github.com/statcan/chms",
+  force = TRUE,
+  upgrade = "never"
+)
+```
+
+## Utilisation
+
+```{r, eval = TRUE, message = FALSE}
+# Load dependencies into current R session
+library(chms)
+library(dplyr)
+```
+
+```{r, eval = TRUE}
+# Create participant meta (external/non-statcan users)
+meta <- tibble(
+  id = c("jane-canuck", "john-canuck"),
+  age = c(10, 40),
+  agd_lfe = c(
+    system.file("extdata", "jane-canuck-lfe.agd", package = "chms"),
+    system.file("extdata", "john-canuck-lfe.agd", package = "chms")
+  ),
+  agd_nml = c(
+    system.file("extdata", "jane-canuck-nml.agd", package = "chms"),
+    system.file("extdata", "john-canuck-nml.agd", package = "chms")
+  ),
+  start_date = c("2021-05-30", "2021-05-27"),
+  epoch_length = c(15, 60)
+)
+
+# Print/examine
+glimpse(meta)
+```
+
+```{r, echo = FALSE, eval = TRUE, message = FALSE}
+# Load latest dev version of chms
+devtools::load_all()
+```
+
+```{r}
+# Create participant meta (statcan users)
+meta <- get_chms_meta(
+  clinic_file = "path/to/clinic/file.sas7bdat",
+  agd_dir = "path/to/agd/files/site",
+  clinic_id = "CLINICID",
+  site = "SITE",
+  age = "CLC_AGE",
+  day = "V2_DAY",
+  month = "V2_MTH",
+  year = "V2_YEAR"
+)
+```
+
+```{r, eval = TRUE}
+# Initialize agd R6 class
+agd_data <- agd$new(
+  id = meta$id,
+  age = meta$age,
+  agd_lfe = meta$agd_lfe,
+  agd_nml = meta$agd_nml,
+  epoch_length = meta$epoch_length,
+  day_max = 7,
+  sleep_algo = "barreira",
+  non_wear_algo = "barreira",
+  start_date = meta$start_date,
+  cpu_max = 2
+)
+
+# Print/examine
+agd_data
+```
+
+```{r, eval = TRUE}
+# Run processing pipeline (load, clean, classify and summarize data)
+agd_data$run()
+```
+
+```{r, eval = TRUE}
+# Export results manually
+agd_data$export("my-results")
+```
+
+```{r, eval = TRUE}
+# Export statcan-formatted results manually
+agd_data$export(stc = TRUE)
+```
+
+```{r, eval = TRUE}
+# Get settings and pipeline run log
+agd_data
+```
+
+```{r, eval = TRUE}
+# Plot data
+plot(agd_data, id = "jane-canuck")
+```
+
+```{r, eval = TRUE}
+# Summarize data
+summary(agd_data)
+```
+
+```{r}
+# View all results in tab
+agd_data$view()
+
+# View specific results in tab
+agd_data$view("summary_full")
+agd_data$view("summary_full_stc")
+agd_data$view("summary_run")
+agd_data$view("summary_sleeping_hours")
+agd_data$view("summary_waking_hours")
+
+# View issues and run log
+agd_data$view("issues")
+agd_data$view("log")
+```
+
+```{r}
+# Store results in stand-alone data frames
+summary_full <- agd_data$results$summary_full
+summary_full_stc <- agd_data$results$summary_full_stc
+summary_run <- agd_data$results$summary_run
+summary_sleeping_hours <- agd_data$results$summary_sleeping_hours
+summary_waking_hours <- agd_data$results$summary_waking_hours
+```
+
+```{r}
+# Render sanity check report
+agd_data$sanity_check(name = "My sanity check report")
+```
+
+## Documentation
+
+```{r}
+?agd
+```
+
+## Comment citer
+
+```{r, eval = TRUE}
+citation("chms")
+```
+
+</details>

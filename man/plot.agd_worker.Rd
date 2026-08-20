@@ -4,10 +4,12 @@
 \alias{plot.agd_worker}
 \title{Plot method for the \link{agd_worker} R6 class.}
 \usage{
-\method{plot}{agd_worker}(x, title_size = 11, axis_size = 9, label_size = 3)
+\method{plot}{agd_worker}(x, ..., title_size = 11, axis_size = 9, label_size = 3)
 }
 \arguments{
 \item{x}{Required: an \link{agd_worker} object.}
+
+\item{...}{Optional: arguments to be passed to methods. \strong{Note:} currently not used.}
 
 \item{title_size}{Required (default: \code{11}): a length-one numeric vector representing the title font size.}
 
@@ -20,4 +22,25 @@ Returns a \code{ggplot2} object invisibly.
 }
 \description{
 This method renders a scatter plot using results from an \link{agd_worker} object.
+}
+\examples{
+\donttest{
+# Initialize agd_worker R6 class
+agd_data <- agd_worker$new(
+  id = "jane-canuck",
+  age = 10,
+  agd_lfe = system.file("extdata", "jane-canuck-lfe.agd", package = "chms"),
+  agd_nml = system.file("extdata", "jane-canuck-nml.agd", package = "chms"),
+  epoch_length = 15,
+  day_max = 7,
+  sleep_algo = "barreira",
+  non_wear_algo = "barreira"
+)
+
+# Run data processing pipeline (load, clean, classify and summarize data)
+agd_data$run()
+
+# Plot data
+plot(agd_data)
+}
 }

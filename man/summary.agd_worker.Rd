@@ -4,14 +4,37 @@
 \alias{summary.agd_worker}
 \title{Summary method for the \link{agd_worker} R6 class.}
 \usage{
-\method{summary}{agd_worker}(object)
+\method{summary}{agd_worker}(object, ...)
 }
 \arguments{
 \item{object}{Required: an \link{agd_worker} object.}
+
+\item{...}{Optional: additional arguments affecting the summary produced. \strong{Note:} currently not used.}
 }
 \value{
 Returns \code{NULL} invisibly.
 }
 \description{
 This method renders summary tibbles for waking and sleeping hours from an \link{agd_worker} object to the console.
+}
+\examples{
+\donttest{
+# Initialize agd_worker R6 class
+agd_data <- agd_worker$new(
+  id = "jane-canuck",
+  age = 10,
+  agd_lfe = system.file("extdata", "jane-canuck-lfe.agd", package = "chms"),
+  agd_nml = system.file("extdata", "jane-canuck-nml.agd", package = "chms"),
+  epoch_length = 15,
+  day_max = 7,
+  sleep_algo = "barreira",
+  non_wear_algo = "barreira"
+)
+
+# Run data processing pipeline (load, clean, classify and summarize data)
+agd_data$run()
+
+# Summarize data
+summary(agd_data)
+}
 }

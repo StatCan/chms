@@ -1,14 +1,34 @@
 #' @title Plot method for the [agd_worker] R6 class.
 #' @description This method renders a scatter plot using results from an [agd_worker] object.
 #' @param x Required: an [agd_worker] object.
+#' @param ... Optional: arguments to be passed to methods. **Note:** currently not used.
 #' @param title_size Required (default: `11`): a length-one numeric vector representing the title font size.
 #' @param axis_size Required (default: `9`): a length-one numeric vector representing the axis font size .
 #' @param label_size Required (default: `3`): a length-one numeric vector representing the label font size.
 #' @return Returns a `ggplot2` object invisibly.
 #' @method plot agd_worker
+#' @examples \donttest{
+#' # Initialize agd_worker R6 class
+#' agd_data <- agd_worker$new(
+#'   id = "jane-canuck",
+#'   age = 10,
+#'   agd_lfe = system.file("extdata", "jane-canuck-lfe.agd", package = "chms"),
+#'   agd_nml = system.file("extdata", "jane-canuck-nml.agd", package = "chms"),
+#'   epoch_length = 15,
+#'   day_max = 7,
+#'   sleep_algo = "barreira",
+#'   non_wear_algo = "barreira"
+#' )
+#'
+#' # Run data processing pipeline (load, clean, classify and summarize data)
+#' agd_data$run()
+#'
+#' # Plot data
+#' plot(agd_data)
+#' }
 #' @export
 
-plot.agd_worker <- function(x, title_size = 11, axis_size = 9, label_size = 3) {
+plot.agd_worker <- function(x, ..., title_size = 11, axis_size = 9, label_size = 3) {
   # Throw error if suggested packages are not installed but needed
   if(! rlang::is_installed("ggplot2")) {
     cli::cli_abort("Please install the {.pkg ggplot2} package.")

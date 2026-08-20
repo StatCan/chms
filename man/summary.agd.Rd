@@ -4,10 +4,12 @@
 \alias{summary.agd}
 \title{Summary method for the \link{agd} R6 class.}
 \usage{
-\method{summary}{agd}(object, row_max = 10)
+\method{summary}{agd}(object, ..., row_max = 10)
 }
 \arguments{
 \item{object}{Required: an \link{agd_worker} object.}
+
+\item{...}{Optional: additional arguments affecting the summary produced. \strong{Note:} currently not used.}
 
 \item{row_max}{Required (default: \code{10}): a length-one integer vector representing the number of rows of summary data to render to the console.}
 }
@@ -16,4 +18,43 @@ Returns \code{NULL} invisibly.
 }
 \description{
 This method renders summary tibbles for waking and sleeping hours from an \link{agd} object to the console.
+}
+\examples{
+\donttest{
+# Create meta data frame (external/non-statcan users)
+meta <- data.frame(
+  id = c("jane-canuck", "john-canuck"),
+  age = c(10, 40),
+  agd_lfe = c(
+    system.file("extdata", "jane-canuck-lfe.agd", package = "chms"),
+    system.file("extdata", "john-canuck-lfe.agd", package = "chms")
+  ),
+  agd_nml = c(
+    system.file("extdata", "jane-canuck-nml.agd", package = "chms"),
+    system.file("extdata", "john-canuck-nml.agd", package = "chms")
+  ),
+  start_date = c("2021-05-30", "2021-05-27"),
+  epoch_length = c(15, 60)
+)
+
+# Initialize agd R6 class
+agd_data <- agd$new(
+  id = meta$id,
+  age = meta$age,
+  agd_lfe = meta$agd_lfe,
+  agd_nml = meta$agd_nml,
+  epoch_length = meta$epoch_length,
+  day_max = 7,
+  sleep_algo = "barreira",
+  non_wear_algo = "barreira",
+  start_date = meta$start_date,
+  cpu_max = 2
+)
+
+# Run data processing pipeline (load, clean, classify and summarize data)
+agd_data$run()
+
+# Summarize data
+summary(agd_data)
+}
 }

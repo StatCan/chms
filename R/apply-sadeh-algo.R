@@ -5,6 +5,31 @@
 #' @param censor_counts Optional (default: `FALSE`): a length-one logical vector representing whether to censor accelerometer counts to a maximum of 300 before applying the Sadeh algorithm.
 #' @param return Required (default: `"everything"`): a character vector representing which vectors to return. If set to "everything", the data frame in `x` will be returned along with all vectors that were derived while applying the Sadeh algorithm.
 #' @return Returns `x` along with all vectors that were derived while applying the Sadeh algorithm. Note: values in the `sadeh_sleep_score` vector that are greater than -4 are interpreted as sleep time (see https://actigraphcorp.my.site.com/support/s/article/Where-can-I-find-documentation-for-the-Sadeh-and-Cole-Kripke-algorithms).
+#' @examples \donttest{
+#' # Initialize agd_worker R6 class
+#' agd_data <- agd_worker$new(
+#'   id = "jane-canuck",
+#'   age = 10,
+#'   agd_lfe = system.file("extdata", "jane-canuck-lfe.agd", package = "chms"),
+#'   agd_nml = system.file("extdata", "jane-canuck-nml.agd", package = "chms"),
+#'   epoch_length = 15,
+#'   day_max = 7,
+#'   sleep_algo = "barreira",
+#'   non_wear_algo = "barreira"
+#' )
+#'
+#' # Load and clean data
+#' agd_data$load()$clean()
+#'
+#' # Apply Sadeh sleep algorithm
+#' dt <- apply_sadeh_algo(
+#'   x = agd_data$data$clean |>
+#'     dplyr::filter(
+#'       epoch_length == 60,
+#'       filter == "LowFrequencyExtension"
+#'     )
+#' )
+#' }
 #' @export
 
 apply_sadeh_algo <- function(x, axis1 = "axis1", censor_counts = FALSE, return = "everything") {

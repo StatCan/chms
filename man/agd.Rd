@@ -7,33 +7,21 @@
 \code{agd} is an R6 class that runs a data processing pipeline on one or more jobs that include two \code{.agd} (ActiGraph; github.com/actigraph) accelerometer files with \code{LowFrequencyExtension} and \code{Normal} filters per participant. This class makes calls to the \link{agd_worker} R6 class.
 }
 \examples{
-\dontrun{
+\donttest{
 # Create meta data frame (external/non-statcan users)
 meta <- data.frame(
   id = c("jane-canuck", "john-canuck"),
-  age = c(16, 32),
+  age = c(10, 40),
   agd_lfe = c(
-    "c:/data/jane-canuck-lfe.agd",
-    "c:/data/john-canuck-lfe.agd"
+    system.file("extdata", "jane-canuck-lfe.agd", package = "chms"),
+    system.file("extdata", "john-canuck-lfe.agd", package = "chms")
   ),
   agd_nml = c(
-    "c:/data/jane-canuck-nml.agd",
-    "c:/data/john-canuck-nml.agd"
+    system.file("extdata", "jane-canuck-nml.agd", package = "chms"),
+    system.file("extdata", "john-canuck-nml.agd", package = "chms")
   ),
-  start_date = c("2026-06-01", "2026-06-01"),
+  start_date = c("2021-05-30", "2021-05-27"),
   epoch_length = c(15, 60)
-)
-
-# Create meta data frame (statcan users)
-meta <- get_chms_meta(
-  clinic_file = "path/to/clinic/file.sas7bat",
-  agd_dir = "path/to/agd/files/site",
-  clinic_id = "CLINICID",
-  site = "SITE",
-  age = "CLC_AGE",
-  day = "V2_DAY",
-  month = "V2_MTH",
-  year = "V2_YEAR"
 )
 
 # Initialize agd R6 class
@@ -47,8 +35,7 @@ agd_data <- agd$new(
   sleep_algo = "barreira",
   non_wear_algo = "barreira",
   start_date = meta$start_date,
-  cpu_max = 8,
-  dir = "path/to/save/results"
+  cpu_max = 2
 )
 
 # Run data processing pipeline (load, clean, classify and summarize data)
@@ -66,7 +53,6 @@ summary(agd_data)
 # Render sanity check report
 agd_data$sanity_check(
   name = "My sanity check report",
-  dir = "/path/to/save/report",
   include_plot = FALSE
 )
 }
@@ -113,7 +99,7 @@ This method creates an instance of an \code{agd_worker} class.
   non_wear_algo = "barreira",
   start_date,
   cpu_max = 1,
-  dir = getwd(),
+  dir = tempdir(),
   ...
 )}\if{html}{\out{</div>}}
 }
@@ -141,7 +127,7 @@ This method creates an instance of an \code{agd_worker} class.
 
 \item{\code{cpu_max}}{Required (default: \code{1}): a length-one integer vector representing the number of CPUs to distribute the data processing across.}
 
-\item{\code{dir}}{Optional (default: \code{getwd()}): a length-one character vector representing the full path to the location where the \code{results} list will be exported tibble by tibble in \code{.csv} format.}
+\item{\code{dir}}{Optional (default: \code{tempdir()}): a length-one character vector representing the full path to the location where the \code{results} list will be exported tibble by tibble in \code{.csv} format.}
 
 \item{\code{...}}{Optional: all other arguments are currently ignored.}
 }

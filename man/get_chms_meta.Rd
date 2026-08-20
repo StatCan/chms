@@ -38,3 +38,18 @@ Returns a tibble with eight vectors (\code{id}, \code{age}, \code{site}, \code{a
 \description{
 This function gets CHMS participant metadata.
 }
+\examples{
+\donttest{
+# Create participant meta (statcan users)
+meta <- get_chms_meta(
+  clinic_file = "path/to/clinic/file.sas7bdat",
+  agd_dir = "path/to/agd/files/site",
+  clinic_id = "CLINICID",
+  site = "SITE",
+  age = "CLC_AGE",
+  day = "V2_DAY",
+  month = "V2_MTH",
+  year = "V2_YEAR"
+)
+}
+}

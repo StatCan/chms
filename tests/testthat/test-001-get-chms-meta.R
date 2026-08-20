@@ -1,5 +1,6 @@
 test_that("Participant meta loads successfully from clinic file and data directories", {
   # Skip if configs not found
+  testthat::skip_on_cran()
   testthat::skip_if_not(nzchar(config::get("cycle7_agd_dir")))
   testthat::skip_if_not(nzchar(config::get("cycle7_clinic_file")))
 

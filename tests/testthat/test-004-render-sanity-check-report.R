@@ -1,5 +1,6 @@
 test_that("Sanity check report in Quarto successfully renders", {
   # Skip if configs not found
+  testthat::skip_on_cran()
   testthat::skip_if_not(nzchar(config::get("cycle7_agd_dir")))
   testthat::skip_if_not(nzchar(config::get("cycle7_clinic_file")))
 
@@ -21,19 +22,13 @@ test_that("Sanity check report in Quarto successfully renders", {
     sleep_algo = "barreira",
     non_wear_algo = "barreira",
     start_date = meta$start_date,
-    cpu_max = 10,
-    dir = getwd()
+    cpu_max = 10
   )
 
   # Run processing pipeline (load, clean, classify and summarize data)
   agd_data$run()
 
   # Run basic checks
-  testthat::expect_no_error(
-    agd_data$sanity_check(
-      name = "My sanity check report",
-      dir = getwd()
-    )
-  )
-  testthat::expect_true(file.exists(paste0(getwd(), "/My sanity check report.html")))
+  testthat::expect_no_error(agd_data$sanity_check(name = "My sanity check report"))
+  testthat::expect_true(file.exists(paste0(tempdir(), "/My sanity check report.html")))
 })

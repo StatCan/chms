@@ -35,3 +35,33 @@ Returns the data frame in the \code{x} argument along with all vectors that were
 \description{
 This function uses a general algorithm to classify an accelerometer axis vector of of epochs based on a set of bout rules.
 }
+\examples{
+\donttest{
+# Initialize agd_worker R6 class
+agd_data <- agd_worker$new(
+  id = "jane-canuck",
+  age = 10,
+  agd_lfe = system.file("extdata", "jane-canuck-lfe.agd", package = "chms"),
+  agd_nml = system.file("extdata", "jane-canuck-nml.agd", package = "chms"),
+  epoch_length = 15,
+  day_max = 7,
+  sleep_algo = "barreira",
+  non_wear_algo = "barreira"
+)
+
+# Load, clean and classify data
+agd_data$load()$clean()$classify()
+
+# Look for 10+ minute bouts of moderate-intensity physical activity
+dt <- apply_general_bout_algo(
+  x = agd_data$data$classify,
+  min_bout_length = 10 * (60 / agd_data$args$movement_epoch_length),
+  target_values = 574:1002,
+  max_exceptions = 2 * (60 / agd_data$args$movement_epoch_length),
+  return = c("dataTimestamp", "axis1", "in_bout")
+)
+
+# Get bout lengths
+rle(dt$in_bout)
+}
+}

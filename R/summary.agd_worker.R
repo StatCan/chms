@@ -1,11 +1,31 @@
 #' @title Summary method for the [agd_worker] R6 class.
 #' @description This method renders summary tibbles for waking and sleeping hours from an [agd_worker] object to the console.
 #' @param object Required: an [agd_worker] object.
+#' @param ... Optional: additional arguments affecting the summary produced. **Note:** currently not used.
 #' @return Returns `NULL` invisibly.
 #' @method summary agd_worker
+#' @examples \donttest{
+#' # Initialize agd_worker R6 class
+#' agd_data <- agd_worker$new(
+#'   id = "jane-canuck",
+#'   age = 10,
+#'   agd_lfe = system.file("extdata", "jane-canuck-lfe.agd", package = "chms"),
+#'   agd_nml = system.file("extdata", "jane-canuck-nml.agd", package = "chms"),
+#'   epoch_length = 15,
+#'   day_max = 7,
+#'   sleep_algo = "barreira",
+#'   non_wear_algo = "barreira"
+#' )
+#'
+#' # Run data processing pipeline (load, clean, classify and summarize data)
+#' agd_data$run()
+#'
+#' # Summarize data
+#' summary(agd_data)
+#' }
 #' @export
 
-summary.agd_worker <- function(object) {
+summary.agd_worker <- function(object, ...) {
   # Render messages to console
   cli::cli_h2(paste0(cli::make_ansi_style("#af3c43")("\U1F341"), cli::make_ansi_style("#000000")("{.emph chms::summary(agd_worker)} method")))
   cli::cli_text("{.strong Waking hours summary}")
