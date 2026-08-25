@@ -1,6 +1,6 @@
 #' @title R6 class: `agd`
 #' @description `agd` is an R6 class that runs a data processing pipeline on one or more jobs that include two `.agd` (ActiGraph; github.com/actigraph) accelerometer files with `LowFrequencyExtension` and `Normal` filters per participant. This class makes calls to the [agd_worker] R6 class.
-#' @examples \donttest{
+#' @examples
 #' # Create meta data frame (external/non-statcan users)
 #' meta <- data.frame(
 #'   id = c("jane-canuck", "john-canuck"),
@@ -24,31 +24,15 @@
 #'   agd_lfe = meta$agd_lfe,
 #'   agd_nml = meta$agd_nml,
 #'   epoch_length = meta$epoch_length,
-#'   day_max = 7,
+#'   day_max = 2,
 #'   sleep_algo = "barreira",
 #'   non_wear_algo = "barreira",
 #'   start_date = meta$start_date,
-#'   cpu_max = 2
+#'   cpu_max = 1
 #' )
 #'
 #' # Run data processing pipeline (load, clean, classify and summarize data)
 #' agd_data$run()
-#'
-#' # Get settings, any issues and log of pipeline run
-#' print(agd_data)
-#'
-#' # Plot data
-#' plot(agd_data)
-#'
-#' # Summarize data
-#' summary(agd_data)
-#'
-#' # Render sanity check report
-#' agd_data$sanity_check(
-#'   name = "My sanity check report",
-#'   include_plot = FALSE
-#' )
-#' }
 #' @export
 
 agd <- R6::R6Class(
@@ -75,10 +59,9 @@ agd <- R6::R6Class(
     #' @param day_max Required (default: `7`): an integer vector (length-one or the same length as `id`) representing the maximum number of days of data to load from `agd_lfe` and `agd_nml`.
     #' @param sleep_algo Required (default: `"barreira"`): a character vector (length-one or the same length as `id`) representing the sleep algorithm to apply. Options currently include `"barreira"`. See [apply_barreira_algo()] for more details.
     #' @param non_wear_algo Required (default: `"barreira"`): a character vector (length-one or the same length as `id`) representing the non-wear algorithm to apply. Options currently include `"barreira"`, `"20-min-algo"`, `"60-min-algo"`, `"90-min-algo"` and `"choi"`. See [apply_barreira_algo()] and [apply_non_wear_algo()] for more details.
-    #' @param start_date Optional: a character or date vector (format: yyyy-mm-dd) that is length-one or the same length as `id` representing the first day of data to load from `agd_lfe` and `agd_nml`. If not set, data will be loaded from the first available day until `day_max` is reached.
+    #' @param start_date Optional (default: `NA`): a character or date vector (format: yyyy-mm-dd) that is length-one or the same length as `id` representing the first day of data to load from `agd_lfe` and `agd_nml`. If not set, data will be loaded from the first available day until `day_max` is reached.
     #' @param cpu_max Required (default: `1`): a length-one integer vector representing the number of CPUs to distribute the data processing across.
-    #' @param dir Optional (default: `tempdir()`): a length-one character vector representing the full path to the location where the `results` list will be exported tibble by tibble in `.csv` format.
-    #' @param ... Optional: all other arguments are currently ignored.
+    #' @param dir Optional (default: `NA`): a length-one character vector representing the full path to the location where the `results` list will be exported tibble by tibble in `.csv` format.
     #' @return Returns an object of class `agd`.
 
     initialize = function(
@@ -90,39 +73,54 @@ agd <- R6::R6Class(
       day_max = 7,
       sleep_algo = "barreira",
       non_wear_algo = "barreira",
-      start_date,
+      start_date = NA,
       cpu_max = 1,
-      dir = tempdir(),
-      ...
+      dir = NA
     ) {
       # Update log
       private$update_log("new()")
 
       # Bind args
-      self$args <- as.list(environment())
-      self$args$id = as.character(self$args$id)
-      if(rlang::is_symbol(self$args$start_date)) self$args$start_date <- NA
+      self$args <- dplyr::tibble(
+        id = id,
+        age = age,
+        agd_lfe = agd_lfe,
+        agd_nml = agd_nml,
+        epoch_length = epoch_length,
+        day_max = day_max,
+        sleep_algo = sleep_algo,
+        non_wear_algo = non_wear_algo,
+        start_date = start_date,
+        cpu_max = cpu_max,
+        dir = dir
+      ) |>
+        dplyr::mutate(
+          id = as.character(id),
+          dir = dplyr::case_when(
+            is.na(dir) ~ "",
+            TRUE ~ dir
+          )
+        ) |>
+        as.list()
+
+      # Truncate select arguments
+      self$args <- lapply(
+        X = setNames(nm = names(self$args)),
+        FUN = function(x) if(x %in% c("cpu_max", "dir")) self$args[[x]][1] else self$args[[x]]
+      )
+
+      # Coerce self$args$start_date to as.Date
       if(inherits(self$args$start_date, "character")) self$args$start_date <- suppressWarnings(as.Date(self$args$start_date))
-      if(rlang::is_symbol(self$args$dir) | suppressWarnings(is.na(self$args$dir))) self$args$dir <- ""
-      self$args$self <- NULL
 
       # Throw error if suggested packages are not installed but needed
-      if(self$args$non_wear_algo == "choi" & ! rlang::is_installed("PhysicalActivity")) {
+      if(sum("choi" %in% self$args$non_wear_algo) & ! rlang::is_installed("PhysicalActivity")) {
         cli::cli_abort("To use the Choi non-wear algorithm, please install the {.pkg PhysicalActivity} package.")
       }
 
       # Create jobs
-      self$jobs <- dplyr::tibble(
-        id = self$args$id,
-        age = self$args$age,
-        agd_nml = self$args$agd_nml,
-        agd_lfe = self$args$agd_lfe,
-        epoch_length = self$args$epoch_length,
-        day_max = self$args$day_max,
-        sleep_algo = self$args$sleep_algo,
-        non_wear_algo = self$args$non_wear_algo,
-        start_date = self$args$start_date
-      )
+      self$jobs <- self$args |>
+        dplyr::as_tibble() |>
+        dplyr::select(-cpu_max, -dir)
 
       # Update cpu_max if greater than jobs or available CPUs
       self$args$cpu_max <- min(self$args$cpu_max, nrow(self$jobs), parallelly::availableCores())
@@ -159,8 +157,8 @@ agd <- R6::R6Class(
         error = function(e) e
       )
 
-      # If self$args$dir set
-      if(! "error" %in% class(self$results)) {
+      # If no error in results
+      if(! inherits(self$results, "error")) {
         # If self$args$dir exists
         if(dir.exists(self$args$dir)) {
           # Set download directory
@@ -170,7 +168,6 @@ agd <- R6::R6Class(
           dir.create(path = dir, showWarnings = FALSE)
 
           # Render message to console
-          cli::cli_text("")
           cli::cli_alert_info("Exporting results to {.file {dir}}.")
 
           # Iterate self$results items
@@ -189,9 +186,11 @@ agd <- R6::R6Class(
             }
           )
         } else {
-          # Render message to console
-          cli::cli_text("")
-          cli::cli_alert_warning("Results cannot be exported because {.file {self$args$dir}} does not exist. Call {.fn $export} to save the results to file.")
+          # If dir argument is set
+          if(self$args$dir != "") {
+            # Render message to console
+            cli::cli_alert_warning("Results cannot be exported because {.file {self$args$dir}} does not exist. Please set {.var dir} in the {.fn $export} call to save the results to file.")
+          }
         }
       }
 
@@ -199,7 +198,7 @@ agd <- R6::R6Class(
       private$update_log("run()")
 
       # Render message to console
-      if(self$args$cpu_max > 1 | self$args$dir != "") cli::cli_text("")
+      if(self$args$dir != "") cli::cli_text("")
       cli::cli_text(paste0(cli::col_green("\u2714"), " Done!"))
 
       # Exit
@@ -215,11 +214,8 @@ agd <- R6::R6Class(
       # Render message to console
       cli::cli_h2(paste0(private$red("\U1F341"), private$black("{.emph chms::agd$export()} method")))
 
-      # Create dir
-      create_dir <- dir.create(path = dir, showWarnings = FALSE, recursive = TRUE)
-
-      # If self$args$dir set
-      if(! "error" %in% class(self$results)) {
+      # If no error in results
+      if(! inherits(self$results, "error")) {
         # If self$args$dir exists
         if(dir.exists(dir)) {
           # If exporting all results
@@ -228,7 +224,7 @@ agd <- R6::R6Class(
             dir <- paste0(dir, "/agd-run-", gsub(pattern = " |[:]|[.]", replacement = "-", x = Sys.time()))
 
             # Create directory
-            dir.create(path = dir, showWarnings = FALSE)
+            dir.create(path = dir, showWarnings = FALSE, recursive = TRUE)
 
             # Get tibbles to export
             tibble_names <- names(self$results)
@@ -263,7 +259,11 @@ agd <- R6::R6Class(
           cli::cli_alert_success("Done!")
         } else {
           # Render message to console
-          cli::cli_abort("Results cannot be exported because {.file {dir}} does not exist. Call {.fn $export} to save the results to file.")
+          if(dir == "") {
+            cli::cli_abort("Results cannot be exported because {.var dir} is not set. Please set {.var dir} in the {.fn $export} call to save the results to file.")
+          } else {
+            cli::cli_abort("Results cannot be exported because {.file {dir}} does not exist. Please set {.var dir} in the {.fn $export} call to save the results to file.")
+          }
         }
       } else {
         # Render message to console
@@ -407,11 +407,22 @@ agd <- R6::R6Class(
       # Render messages to console
       cli::cli_h2(paste0(private$red("\U1F341"), private$black("{.emph chms::sanity_check()} method")))
 
+      # Throw error is dir does not exist
+      if(! dir.exists(dir)) {
+        if(dir == "") {
+          cli::cli_abort("The {.var dir} argument is not set. Please set {.var dir} in the {.fn $sanity_check} call.")
+        } else {
+          cli::cli_abort("The {.file {dir}} path does not exist. Please set {.var dir} in the {.fn $sanity_check} call.")
+        }
+      }
+
       # Throw error if suggested packages are not installed but needed
       if(! rlang::is_installed("ggplot2")) {
         cli::cli_abort("Please install the {.pkg ggplot2} package.")
       } else if(! rlang::is_installed("kableExtra")) {
         cli::cli_abort("Please install the {.pkg kableExtra} package.")
+      } else if(! rlang::is_installed("quarto")) {
+        cli::cli_abort("Please install the {.pkg quarto} package.")
       } else if(! rlang::is_installed("scales")) {
         cli::cli_abort("Please install the {.pkg scales} package.")
       } else if(! rlang::is_installed("tibble")) {
@@ -422,10 +433,10 @@ agd <- R6::R6Class(
       report_name_qmd <- paste0(name, ".qmd")
       report_name_html <- paste0(name, ".html")
 
-      # Copy quarto doc to temp directory (for now)
+      # Copy quarto doc to dir
       copy_file <- file.copy(
         from = system.file("qmd", "sanity-check-report.qmd", package = "chms"),
-        to = paste0(tempdir(), "/", report_name_qmd),
+        to = paste0(dir, "/", report_name_qmd),
         overwrite = TRUE
       )
 
@@ -435,71 +446,43 @@ agd <- R6::R6Class(
       # Temporarily save parameters to temp directory
       timestamp <- gsub(" |[:]|[.]|-", "_", Sys.time())
       dir.create(
-        path = paste0(tempdir(), "/agd-temp/sanity-check-params/"),
+        path = paste0(dir, "/agd-temp/sanity-check-params/"),
         showWarnings = FALSE,
         recursive = TRUE
       )
       saveRDS(
         object = self$results$summary_run,
-        file = paste0(tempdir(), "/agd-temp/sanity-check-params/summary-run.rds")
+        file = paste0(dir, "/agd-temp/sanity-check-params/summary-run.rds")
       )
       saveRDS(
         object = self$results$summary_waking_hours,
-        file = paste0(tempdir(), "/agd-temp/sanity-check-params/summary-waking-hours.rds")
+        file = paste0(dir, "/agd-temp/sanity-check-params/summary-waking-hours.rds")
       )
       saveRDS(
         object = self$results$summary_sleeping_hours,
-        file = paste0(tempdir(), "/agd-temp/sanity-check-params/summary-sleeping-hours.rds")
+        file = paste0(dir, "/agd-temp/sanity-check-params/summary-sleeping-hours.rds")
       )
 
       # Render Quarto doc
       quarto::quarto_render(
         input = paste0(
-          tempdir(),
+          dir,
           "/",
           report_name_qmd
         ),
         execute_params = list(
-          summary_run = paste0(tempdir(), "/agd-temp/sanity-check-params/summary-run.rds"),
-          summary_waking_hours = paste0(tempdir(), "/agd-temp/sanity-check-params/summary-waking-hours.rds"),
-          summary_sleeping_hours = paste0(tempdir(), "/agd-temp/sanity-check-params/summary-sleeping-hours.rds"),
+          summary_run = paste0(dir, "/agd-temp/sanity-check-params/summary-run.rds"),
+          summary_waking_hours = paste0(dir, "/agd-temp/sanity-check-params/summary-waking-hours.rds"),
+          summary_sleeping_hours = paste0(dir, "/agd-temp/sanity-check-params/summary-sleeping-hours.rds"),
           include_plot = include_plot
         )
       )
 
-      # Remove parameters from temporary storage
+      # Clean up
       unlink(
-        x = paste0(tempdir(), "/agd-temp"),
+        x = paste0(dir, c("/agd-temp", paste0("/", report_name_qmd))),
         recursive = TRUE
       )
-
-      # Remove qmd file
-      remove_file <- file.remove(
-        paste0(
-          tempdir(),
-          "/",
-          report_name_qmd
-        )
-      )
-
-      # Copy quarto doc to dir
-      if(dir != tempdir()) {
-        # Copy file
-        copy_file <- file.copy(
-          from = paste0(tempdir(), "/", report_name_html),
-          to = paste0(dir, "/", report_name_html),
-          overwrite = TRUE
-        )
-
-        # Remove file from working directory
-        remove_file <- file.remove(
-          paste0(
-            tempdir(),
-            "/",
-            report_name_html
-          )
-        )
-      }
 
       # Render message to console
       cli::cli_text(paste0(cli::col_green("\u2714"), " Done!"))

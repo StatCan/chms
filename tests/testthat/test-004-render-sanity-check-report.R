@@ -29,6 +29,11 @@ test_that("Sanity check report in Quarto successfully renders", {
   agd_data$run()
 
   # Run basic checks
-  testthat::expect_no_error(agd_data$sanity_check(name = "My sanity check report"))
+  testthat::expect_no_error(agd_data$sanity_check(name = "My sanity check report", dir = tempdir()))
   testthat::expect_true(file.exists(paste0(tempdir(), "/My sanity check report.html")))
+
+  # Clean up
+  unlink(x = paste0(tempdir(), "/My sanity check report.html"), force = TRUE)
+  quarto_params <- list.files(path = tempdir(), pattern = "quarto-params", full.names = TRUE)
+  if(length(quarto_params)) unlink(x = quarto_params, force = TRUE)
 })

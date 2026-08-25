@@ -7,7 +7,6 @@
 \code{agd_worker} is an R6 class that runs a data processing pipeline on two \code{.agd} (ActiGraph; github.com/actigraph) accelerometer files with \code{LowFrequencyExtension} and \code{Normal} filters for a single participant. This class does all the heavy lifting for the \link{agd} R6 class.
 }
 \examples{
-\donttest{
 # Initialize agd_worker R6 class
 agd_data <- agd_worker$new(
   id = "jane-canuck",
@@ -15,14 +14,13 @@ agd_data <- agd_worker$new(
   agd_lfe = system.file("extdata", "jane-canuck-lfe.agd", package = "chms"),
   agd_nml = system.file("extdata", "jane-canuck-nml.agd", package = "chms"),
   epoch_length = 15,
-  day_max = 7,
+  day_max = 3,
   sleep_algo = "barreira",
   non_wear_algo = "barreira"
 )
 
 # Run data processing pipeline (load, clean, classify and summarize data)
 agd_data$run()
-}
 }
 \section{Public fields}{
 \if{html}{\out{<div class="r6-fields">}}
@@ -67,8 +65,7 @@ This method creates an instance of an \code{agd_worker} class.
   day_max = 7,
   sleep_algo = "barreira",
   non_wear_algo = "barreira",
-  start_date,
-  ...
+  start_date = NA
 )}\if{html}{\out{</div>}}
 }
 
@@ -91,9 +88,7 @@ This method creates an instance of an \code{agd_worker} class.
 
 \item{\code{non_wear_algo}}{Required (default: \code{"barreira"}): a length-one character vector representing the non-wear algorithm to apply. Options currently include \code{"barreira"}, \code{"20-min-algo"}, \code{"60-min-algo"}, \code{"90-min-algo"} and \code{"choi"}. See \code{\link[=apply_barreira_algo]{apply_barreira_algo()}} and \code{\link[=apply_non_wear_algo]{apply_non_wear_algo()}} for more details.}
 
-\item{\code{start_date}}{Optional: a length-one date vector (format: yyyy-mm-dd) representing the first day of data to load from \code{agd_lfe} and \code{agd_nml}. If not set, data will be loaded from the first available day until \code{day_max} is reached.}
-
-\item{\code{...}}{Optional: all other arguments are currently ignored.}
+\item{\code{start_date}}{Optional (default: \code{NA}): a length-one date vector (format: yyyy-mm-dd) representing the first day of data to load from \code{agd_lfe} and \code{agd_nml}. If not set, data will be loaded from the first available day until \code{day_max} is reached.}
 }
 \if{html}{\out{</div>}}
 }

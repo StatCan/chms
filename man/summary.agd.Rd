@@ -20,7 +20,6 @@ Returns \code{NULL} invisibly.
 This method renders summary tibbles for waking and sleeping hours from an \link{agd} object to the console.
 }
 \examples{
-\donttest{
 # Create meta data frame (external/non-statcan users)
 meta <- data.frame(
   id = c("jane-canuck", "john-canuck"),
@@ -44,11 +43,11 @@ agd_data <- agd$new(
   agd_lfe = meta$agd_lfe,
   agd_nml = meta$agd_nml,
   epoch_length = meta$epoch_length,
-  day_max = 7,
+  day_max = 2,
   sleep_algo = "barreira",
   non_wear_algo = "barreira",
   start_date = meta$start_date,
-  cpu_max = 2
+  cpu_max = 1
 )
 
 # Run data processing pipeline (load, clean, classify and summarize data)
@@ -56,5 +55,4 @@ agd_data$run()
 
 # Summarize data
 summary(agd_data)
-}
 }

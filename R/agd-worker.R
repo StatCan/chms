@@ -1,6 +1,6 @@
 #' @title R6 class: `agd_worker`
 #' @description `agd_worker` is an R6 class that runs a data processing pipeline on two `.agd` (ActiGraph; github.com/actigraph) accelerometer files with `LowFrequencyExtension` and `Normal` filters for a single participant. This class does all the heavy lifting for the [agd] R6 class.
-#' @examples \donttest{
+#' @examples
 #' # Initialize agd_worker R6 class
 #' agd_data <- agd_worker$new(
 #'   id = "jane-canuck",
@@ -8,14 +8,13 @@
 #'   agd_lfe = system.file("extdata", "jane-canuck-lfe.agd", package = "chms"),
 #'   agd_nml = system.file("extdata", "jane-canuck-nml.agd", package = "chms"),
 #'   epoch_length = 15,
-#'   day_max = 7,
+#'   day_max = 3,
 #'   sleep_algo = "barreira",
 #'   non_wear_algo = "barreira"
 #' )
 #'
 #' # Run data processing pipeline (load, clean, classify and summarize data)
 #' agd_data$run()
-#' }
 #' @export
 
 agd_worker <- R6::R6Class(
@@ -54,8 +53,7 @@ agd_worker <- R6::R6Class(
     #' @param day_max Required (default: `7`): a length-one integer vector representing the maximum number of days of data to load from `agd_lfe` and `agd_nml`.
     #' @param sleep_algo Required (default: `"barreira"`): a length-one character vector representing the sleep algorithm to apply. Options currently include `"barreira"`. See [apply_barreira_algo()] for more details.
     #' @param non_wear_algo Required (default: `"barreira"`): a length-one character vector representing the non-wear algorithm to apply. Options currently include `"barreira"`, `"20-min-algo"`, `"60-min-algo"`, `"90-min-algo"` and `"choi"`. See [apply_barreira_algo()] and [apply_non_wear_algo()] for more details.
-    #' @param start_date Optional: a length-one date vector (format: yyyy-mm-dd) representing the first day of data to load from `agd_lfe` and `agd_nml`. If not set, data will be loaded from the first available day until `day_max` is reached.
-    #' @param ... Optional: all other arguments are currently ignored.
+    #' @param start_date Optional (default: `NA`): a length-one date vector (format: yyyy-mm-dd) representing the first day of data to load from `agd_lfe` and `agd_nml`. If not set, data will be loaded from the first available day until `day_max` is reached.
     #' @return Returns an object of class `agd_worker`.
 
     initialize = function(
@@ -67,8 +65,7 @@ agd_worker <- R6::R6Class(
       day_max = 7,
       sleep_algo = "barreira",
       non_wear_algo = "barreira",
-      start_date,
-      ...
+      start_date = NA
     ) {
       # Update log
       self$log <- dplyr::tibble(
@@ -79,10 +76,19 @@ agd_worker <- R6::R6Class(
       )
 
       # Bind args
-      self$args <- as.list(environment())
-      self$args$id <- as.character(self$args$id)
-      if(rlang::is_symbol(self$args$start_date)) self$args$start_date <- NA
-      self$args$self <- NULL
+      self$args <- dplyr::tibble(
+        id = id,
+        age = age,
+        agd_lfe = agd_lfe,
+        agd_nml = agd_nml,
+        epoch_length = epoch_length,
+        day_max = day_max,
+        sleep_algo = sleep_algo,
+        non_wear_algo = non_wear_algo,
+        start_date = start_date
+      ) |>
+        dplyr::mutate(id = as.character(id)) |>
+        as.list()
 
       # Update issues
       if(self$args$age < 3) self$issues$age_out_of_range <- "yes"
@@ -144,11 +150,11 @@ agd_worker <- R6::R6Class(
         self$issues$files_mismatched <- "yes"
       }
 
-      if(! "error" %in% class(self$data$raw) & ! nrow(self$data$raw)) {
+      if(! inherits(self$data$raw, "error") && ! nrow(self$data$raw)) {
         self$issues$file_empty <- "yes"
       }
 
-      if(! "error" %in% class(self$data$settings) & format(x = as.POSIXct(x = self$data$settings$startdatetime, tz = self$data$settings$time_zone), format = "%H") != "00") {
+      if(! inherits(self$data$settings, "error") && format(x = as.POSIXct(x = self$data$settings$startdatetime, tz = self$data$settings$time_zone), format = "%H") != "00") {
         self$issues$non_midnight_start <- "yes"
       }
 
@@ -277,7 +283,7 @@ agd_worker <- R6::R6Class(
         tidyr::pivot_longer(cols = dplyr::everything())
 
       # Add to args if settings loaded
-      if("settings" %in% names(self$data) & ! "error" %in% class(self$data$settings)) {
+      if("settings" %in% names(self$data) & ! inherits(self$data$settings, "error")) {
         args <- dplyr::bind_rows(
           args,
           self$data$settings |>

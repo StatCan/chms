@@ -7,7 +7,6 @@
 \code{agd} is an R6 class that runs a data processing pipeline on one or more jobs that include two \code{.agd} (ActiGraph; github.com/actigraph) accelerometer files with \code{LowFrequencyExtension} and \code{Normal} filters per participant. This class makes calls to the \link{agd_worker} R6 class.
 }
 \examples{
-\donttest{
 # Create meta data frame (external/non-statcan users)
 meta <- data.frame(
   id = c("jane-canuck", "john-canuck"),
@@ -31,31 +30,15 @@ agd_data <- agd$new(
   agd_lfe = meta$agd_lfe,
   agd_nml = meta$agd_nml,
   epoch_length = meta$epoch_length,
-  day_max = 7,
+  day_max = 2,
   sleep_algo = "barreira",
   non_wear_algo = "barreira",
   start_date = meta$start_date,
-  cpu_max = 2
+  cpu_max = 1
 )
 
 # Run data processing pipeline (load, clean, classify and summarize data)
 agd_data$run()
-
-# Get settings, any issues and log of pipeline run
-print(agd_data)
-
-# Plot data
-plot(agd_data)
-
-# Summarize data
-summary(agd_data)
-
-# Render sanity check report
-agd_data$sanity_check(
-  name = "My sanity check report",
-  include_plot = FALSE
-)
-}
 }
 \section{Public fields}{
 \if{html}{\out{<div class="r6-fields">}}
@@ -97,10 +80,9 @@ This method creates an instance of an \code{agd_worker} class.
   day_max = 7,
   sleep_algo = "barreira",
   non_wear_algo = "barreira",
-  start_date,
+  start_date = NA,
   cpu_max = 1,
-  dir = tempdir(),
-  ...
+  dir = NA
 )}\if{html}{\out{</div>}}
 }
 
@@ -123,13 +105,11 @@ This method creates an instance of an \code{agd_worker} class.
 
 \item{\code{non_wear_algo}}{Required (default: \code{"barreira"}): a character vector (length-one or the same length as \code{id}) representing the non-wear algorithm to apply. Options currently include \code{"barreira"}, \code{"20-min-algo"}, \code{"60-min-algo"}, \code{"90-min-algo"} and \code{"choi"}. See \code{\link[=apply_barreira_algo]{apply_barreira_algo()}} and \code{\link[=apply_non_wear_algo]{apply_non_wear_algo()}} for more details.}
 
-\item{\code{start_date}}{Optional: a character or date vector (format: yyyy-mm-dd) that is length-one or the same length as \code{id} representing the first day of data to load from \code{agd_lfe} and \code{agd_nml}. If not set, data will be loaded from the first available day until \code{day_max} is reached.}
+\item{\code{start_date}}{Optional (default: \code{NA}): a character or date vector (format: yyyy-mm-dd) that is length-one or the same length as \code{id} representing the first day of data to load from \code{agd_lfe} and \code{agd_nml}. If not set, data will be loaded from the first available day until \code{day_max} is reached.}
 
 \item{\code{cpu_max}}{Required (default: \code{1}): a length-one integer vector representing the number of CPUs to distribute the data processing across.}
 
-\item{\code{dir}}{Optional (default: \code{tempdir()}): a length-one character vector representing the full path to the location where the \code{results} list will be exported tibble by tibble in \code{.csv} format.}
-
-\item{\code{...}}{Optional: all other arguments are currently ignored.}
+\item{\code{dir}}{Optional (default: \code{NA}): a length-one character vector representing the full path to the location where the \code{results} list will be exported tibble by tibble in \code{.csv} format.}
 }
 \if{html}{\out{</div>}}
 }

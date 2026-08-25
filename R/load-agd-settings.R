@@ -2,7 +2,7 @@
 #' @description This function loads the `settings` table from an ActiGraph `.agd` file.
 #' @param file Required: a length-one character vector representing the full path to an `.agd` file.
 #' @return Returns a tibble of the `settings` table in a wide shape.
-#' @examples \donttest{
+#' @examples
 #' # Initialize agd_worker R6 class
 #' agd_data <- agd_worker$new(
 #'   id = "jane-canuck",
@@ -10,14 +10,13 @@
 #'   agd_lfe = system.file("extdata", "jane-canuck-lfe.agd", package = "chms"),
 #'   agd_nml = system.file("extdata", "jane-canuck-nml.agd", package = "chms"),
 #'   epoch_length = 15,
-#'   day_max = 7,
+#'   day_max = 3,
 #'   sleep_algo = "barreira",
 #'   non_wear_algo = "barreira"
 #' )
 #'
 #' # Load ActiGraph settings
 #' dt <- load_agd_settings(agd_data$args$agd_lfe)
-#' }
 #' @export
 
 load_agd_settings <- function(file) {
@@ -26,6 +25,9 @@ load_agd_settings <- function(file) {
     drv = RSQLite::SQLite(),
     dbname = file
   )
+
+  # Close connection to database on exit
+  on.exit(expr = DBI::dbDisconnect(conn = connection), add = TRUE)
 
   # Get settings table
   settings <- connection |>
@@ -54,9 +56,6 @@ load_agd_settings <- function(file) {
         )
       )
     )
-
-  # Close connection to database
-  DBI::dbDisconnect(conn = connection)
 
   # Exit
   return(settings)

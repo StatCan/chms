@@ -48,11 +48,11 @@ agd_data
 # Run processing pipeline (load, clean, classify and summarize data)
 agd_data$run()
 
-# Export results manually
-agd_data$export()
+# Export results
+agd_data$export(dir = tempdir())
 
-# Export statcan-formatted results manually
-agd_data$export(stc = TRUE)
+# Export statcan-formatted results
+agd_data$export(dir = tempdir(), stc = TRUE)
 
 # Get settings and pipeline run log
 agd_data
@@ -85,4 +85,4 @@ summary_sleeping_hours <- agd_data$results$summary_sleeping_hours
 summary_waking_hours <- agd_data$results$summary_waking_hours
 
 # Render sanity check report
-agd_data$sanity_check(name = "My sanity check report")
+agd_data$sanity_check(dir = tempdir(), name = "My sanity check report")

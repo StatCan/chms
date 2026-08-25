@@ -152,7 +152,7 @@ agd_data
 #> Settings
 #> 
 #> # A tibble: 2 × 9
-#>   id         age   agd_nml agd_lfe epoch_length day_max sleep_algo non_wear_algo
+#>   id         age   agd_lfe agd_nml epoch_length day_max sleep_algo non_wear_algo
 #>   <chr>      <chr> <chr>   <chr>   <chr>        <chr>   <chr>      <chr>        
 #> 1 jane-canu… 10    C:/Use… C:/Use… 15           7       barreira   barreira     
 #> 2 john-canu… 40    C:/Use… C:/Use… 60           7       barreira   barreira     
@@ -163,7 +163,7 @@ agd_data
 #> # A tibble: 1 × 4
 #>   method timestamp           status  message
 #>   <chr>  <dttm>              <chr>   <chr>  
-#> 1 new()  2026-08-20 08:36:37 success ""
+#> 1 new()  2026-08-25 19:22:40 success ""
 ```
 
 ``` r
@@ -174,29 +174,29 @@ agd_data$run()
 #> 
 #> ℹ Crunching data for 2 participants across 2 CPUs.
 #> 
-#> ℹ Exporting results to 'C:\Users\Clippy\AppData\Local\Temp\RtmpmOmtub/agd-run-2026-08-20-08-36-45-471129'.
+#> ■■■■■■■■■■■■■■■■                  50% | ETA:  7s
+#> ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■  100% | ETA:  0s
+#> ✔ Done!
+```
+
+``` r
+# Export results
+agd_data$export(dir = tempdir())
+#> 
+#> ── 🍁chms::agd$export() method ──
+#> 
+#> ℹ Exporting results to 'C:\Users\Clippy\AppData\Local\Temp\Rtmp0kKTmq/agd-run-2026-08-25-19-22-48-815256'.
 #> 
 #> ✔ Done!
 ```
 
 ``` r
-# Export results manually
-agd_data$export("my-results")
+# Export statcan-formatted results
+agd_data$export(dir = tempdir(), stc = TRUE)
 #> 
 #> ── 🍁chms::agd$export() method ──
 #> 
-#> ℹ Exporting results to 'my-results/agd-run-2026-08-20-08-36-45-617149'.
-#> 
-#> ✔ Done!
-```
-
-``` r
-# Export statcan-formatted results manually
-agd_data$export(stc = TRUE)
-#> 
-#> ── 🍁chms::agd$export() method ──
-#> 
-#> ℹ Exporting `self$results$summary_full_stc` and `self$results$summary_run` to 'C:\Users\Clippy\AppData\Local\Temp\RtmpmOmtub'.
+#> ℹ Exporting `self$results$summary_full_stc` and `self$results$summary_run` to 'C:\Users\Clippy\AppData\Local\Temp\Rtmp0kKTmq'.
 #> 
 #> ✔ Done!
 ```
@@ -210,7 +210,7 @@ agd_data
 #> Settings
 #> 
 #> # A tibble: 2 × 9
-#>   id         age   agd_nml agd_lfe epoch_length day_max sleep_algo non_wear_algo
+#>   id         age   agd_lfe agd_nml epoch_length day_max sleep_algo non_wear_algo
 #>   <chr>      <chr> <chr>   <chr>   <chr>        <chr>   <chr>      <chr>        
 #> 1 jane-canu… 10    C:/Use… C:/Use… 15           7       barreira   barreira     
 #> 2 john-canu… 40    C:/Use… C:/Use… 60           7       barreira   barreira     
@@ -221,8 +221,8 @@ agd_data
 #> # A tibble: 2 × 4
 #>   method timestamp           status  message
 #>   <chr>  <dttm>              <chr>   <chr>  
-#> 1 new()  2026-08-20 08:36:37 success ""     
-#> 2 run()  2026-08-20 08:36:45 success ""
+#> 1 new()  2026-08-25 19:22:40 success ""     
+#> 2 run()  2026-08-25 19:22:48 success ""
 ```
 
 ``` r
@@ -299,7 +299,7 @@ summary_waking_hours <- agd_data$results$summary_waking_hours
 
 ``` r
 # Render sanity check report
-agd_data$sanity_check(name = "My sanity check report")
+agd_data$sanity_check(dir = tempdir(), name = "My sanity check report")
 ```
 
 ## Documentation
@@ -494,7 +494,7 @@ agd_data
 #> Settings
 #> 
 #> # A tibble: 2 × 9
-#>   id         age   agd_nml agd_lfe epoch_length day_max sleep_algo non_wear_algo
+#>   id         age   agd_lfe agd_nml epoch_length day_max sleep_algo non_wear_algo
 #>   <chr>      <chr> <chr>   <chr>   <chr>        <chr>   <chr>      <chr>        
 #> 1 jane-canu… 10    C:/Use… C:/Use… 15           7       barreira   barreira     
 #> 2 john-canu… 40    C:/Use… C:/Use… 60           7       barreira   barreira     
@@ -505,7 +505,7 @@ agd_data
 #> # A tibble: 1 × 4
 #>   method timestamp           status  message
 #>   <chr>  <dttm>              <chr>   <chr>  
-#> 1 new()  2026-08-20 08:37:02 success ""
+#> 1 new()  2026-08-25 19:23:04 success ""
 ```
 
 ``` r
@@ -516,29 +516,29 @@ agd_data$run()
 #> 
 #> ℹ Crunching data for 2 participants across 2 CPUs.
 #> 
-#> ℹ Exporting results to 'C:\Users\Clippy\AppData\Local\Temp\RtmpmOmtub/agd-run-2026-08-20-08-37-10-43244'.
+#> ■■■■■■■■■■■■■■■■                  50% | ETA:  7s
+#> ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■  100% | ETA:  0s
+#> ✔ Done!
+```
+
+``` r
+# Export results
+agd_data$export(dir = tempdir())
+#> 
+#> ── 🍁chms::agd$export() method ──
+#> 
+#> ℹ Exporting results to 'C:\Users\Clippy\AppData\Local\Temp\Rtmp0kKTmq/agd-run-2026-08-25-19-23-11-65182'.
 #> 
 #> ✔ Done!
 ```
 
 ``` r
-# Export results manually
-agd_data$export("my-results")
+# Export statcan-formatted results
+agd_data$export(dir = tempdir(), stc = TRUE)
 #> 
 #> ── 🍁chms::agd$export() method ──
 #> 
-#> ℹ Exporting results to 'my-results/agd-run-2026-08-20-08-37-10-522613'.
-#> 
-#> ✔ Done!
-```
-
-``` r
-# Export statcan-formatted results manually
-agd_data$export(stc = TRUE)
-#> 
-#> ── 🍁chms::agd$export() method ──
-#> 
-#> ℹ Exporting `self$results$summary_full_stc` and `self$results$summary_run` to 'C:\Users\Clippy\AppData\Local\Temp\RtmpmOmtub'.
+#> ℹ Exporting `self$results$summary_full_stc` and `self$results$summary_run` to 'C:\Users\Clippy\AppData\Local\Temp\Rtmp0kKTmq'.
 #> 
 #> ✔ Done!
 ```
@@ -552,7 +552,7 @@ agd_data
 #> Settings
 #> 
 #> # A tibble: 2 × 9
-#>   id         age   agd_nml agd_lfe epoch_length day_max sleep_algo non_wear_algo
+#>   id         age   agd_lfe agd_nml epoch_length day_max sleep_algo non_wear_algo
 #>   <chr>      <chr> <chr>   <chr>   <chr>        <chr>   <chr>      <chr>        
 #> 1 jane-canu… 10    C:/Use… C:/Use… 15           7       barreira   barreira     
 #> 2 john-canu… 40    C:/Use… C:/Use… 60           7       barreira   barreira     
@@ -563,8 +563,8 @@ agd_data
 #> # A tibble: 2 × 4
 #>   method timestamp           status  message
 #>   <chr>  <dttm>              <chr>   <chr>  
-#> 1 new()  2026-08-20 08:37:02 success ""     
-#> 2 run()  2026-08-20 08:37:10 success ""
+#> 1 new()  2026-08-25 19:23:04 success ""     
+#> 2 run()  2026-08-25 19:23:11 success ""
 ```
 
 ``` r
@@ -641,7 +641,7 @@ summary_waking_hours <- agd_data$results$summary_waking_hours
 
 ``` r
 # Render sanity check report
-agd_data$sanity_check(name = "My sanity check report")
+agd_data$sanity_check(dir = tempdir(), name = "My sanity check report")
 ```
 
 ## Documentation

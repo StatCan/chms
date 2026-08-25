@@ -36,7 +36,6 @@ Returns the data frame in the \code{x} argument along with all vectors that were
 This function uses a general algorithm to classify an accelerometer axis vector of of epochs based on a set of bout rules.
 }
 \examples{
-\donttest{
 # Initialize agd_worker R6 class
 agd_data <- agd_worker$new(
   id = "jane-canuck",
@@ -44,7 +43,7 @@ agd_data <- agd_worker$new(
   agd_lfe = system.file("extdata", "jane-canuck-lfe.agd", package = "chms"),
   agd_nml = system.file("extdata", "jane-canuck-nml.agd", package = "chms"),
   epoch_length = 15,
-  day_max = 7,
+  day_max = 3,
   sleep_algo = "barreira",
   non_wear_algo = "barreira"
 )
@@ -63,5 +62,4 @@ dt <- apply_general_bout_algo(
 
 # Get bout lengths
 rle(dt$in_bout)
-}
 }

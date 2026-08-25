@@ -155,13 +155,13 @@ agd_data$run()
 ```
 
 ```{r, eval = TRUE}
-# Export results manually
-agd_data$export("my-results")
+# Export results
+agd_data$export(dir = tempdir())
 ```
 
 ```{r, eval = TRUE}
-# Export statcan-formatted results manually
-agd_data$export(stc = TRUE)
+# Export statcan-formatted results
+agd_data$export(dir = tempdir(), stc = TRUE)
 ```
 
 ```{r, eval = TRUE}
@@ -206,7 +206,7 @@ summary_waking_hours <- agd_data$results$summary_waking_hours
 
 ```{r}
 # Render sanity check report
-agd_data$sanity_check(name = "My sanity check report")
+agd_data$sanity_check(dir = tempdir(), name = "My sanity check report")
 ```
 
 ## Documentation
@@ -370,13 +370,13 @@ agd_data$run()
 ```
 
 ```{r, eval = TRUE}
-# Export results manually
-agd_data$export("my-results")
+# Export results
+agd_data$export(dir = tempdir())
 ```
 
 ```{r, eval = TRUE}
-# Export statcan-formatted results manually
-agd_data$export(stc = TRUE)
+# Export statcan-formatted results
+agd_data$export(dir = tempdir(), stc = TRUE)
 ```
 
 ```{r, eval = TRUE}
@@ -421,7 +421,7 @@ summary_waking_hours <- agd_data$results$summary_waking_hours
 
 ```{r}
 # Render sanity check report
-agd_data$sanity_check(name = "My sanity check report")
+agd_data$sanity_check(dir = tempdir(), name = "My sanity check report")
 ```
 
 ## Documentation

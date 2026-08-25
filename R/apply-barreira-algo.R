@@ -10,7 +10,7 @@
 #' @param age Required: a length-one integer vector representing the participant's age in years. This parameter is used to determine when the first sleep bout can begin. Statistics Canada sets the time to 18:00 for participants under five years and younger, and 19:00 for all other ages.
 #' @param return Required (default: "`everything`"): a character vector representing which vectors in `x` to return. If set to "`everything`", the data frame in `x` will be returned along with all vectors that were derived while applying the Barreira algorithm.
 #' @return Returns the data frame `x` along with all vectors that were derived while applying the Barreira algorithm.
-#' @examples \donttest{
+#' @examples
 #' # Initialize agd_worker R6 class
 #' agd_data <- agd_worker$new(
 #'   id = "jane-canuck",
@@ -18,13 +18,14 @@
 #'   agd_lfe = system.file("extdata", "jane-canuck-lfe.agd", package = "chms"),
 #'   agd_nml = system.file("extdata", "jane-canuck-nml.agd", package = "chms"),
 #'   epoch_length = 15,
-#'   day_max = 7,
+#'   day_max = 3,
 #'   sleep_algo = "barreira",
 #'   non_wear_algo = "barreira"
 #' )
 #'
 #' # Load and clean data
 #' agd_data$load()$clean()
+#'
 #'
 #' # Apply Barreira sleep algorithm
 #' dt <- apply_barreira_algo(
@@ -35,7 +36,6 @@
 #'     ),
 #'   age = agd_data$args$age
 #' )
-#' }
 #' @export
 
 apply_barreira_algo <- function(

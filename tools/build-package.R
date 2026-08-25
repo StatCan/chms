@@ -40,6 +40,7 @@ usethis::use_description(
 usethis::use_package("cli", "Imports")
 usethis::use_package("config", "Suggests")
 usethis::use_package("DBI", "Imports")
+usethis::use_package("dbplyr", "Imports")
 usethis::use_package("dplyr", "Imports")
 usethis::use_package("ggplot2", "Suggests")
 usethis::use_package("haven", "Imports")
@@ -100,14 +101,30 @@ devtools::test()
 # Update NAMESPACE and create documentation
 devtools::check_man()
 
-# Check package build
-devtools::check()
-
-# Run R CMD check
-rcmdcheck::rcmdcheck(args = "--as-cran")
+# Run CRAN check
+devtools::check(
+  cran = TRUE,
+  remote = TRUE,
+  force_suggests = TRUE,
+  args = "--as-cran",
+  error_on = "error"
+)
 
 # Check with CRAN's incoming checks
 urlchecker::url_check()
 
+# Run all examples
+devtools::run_examples(fresh = TRUE)
+
 # Build package
-devtools::build()
+package_build_path <- devtools::build()
+
+# Run CRAN check
+devtools::check_built(
+  path = package_build_path,
+  cran = TRUE,
+  remote = TRUE,
+  force_suggests = TRUE,
+  args = "--as-cran",
+  error_on = "error"
+)

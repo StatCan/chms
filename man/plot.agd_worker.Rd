@@ -24,7 +24,6 @@ Returns a \code{ggplot2} object invisibly.
 This method renders a scatter plot using results from an \link{agd_worker} object.
 }
 \examples{
-\donttest{
 # Initialize agd_worker R6 class
 agd_data <- agd_worker$new(
   id = "jane-canuck",
@@ -32,7 +31,7 @@ agd_data <- agd_worker$new(
   agd_lfe = system.file("extdata", "jane-canuck-lfe.agd", package = "chms"),
   agd_nml = system.file("extdata", "jane-canuck-nml.agd", package = "chms"),
   epoch_length = 15,
-  day_max = 7,
+  day_max = 2,
   sleep_algo = "barreira",
   non_wear_algo = "barreira"
 )
@@ -42,5 +41,4 @@ agd_data$run()
 
 # Plot data
 plot(agd_data)
-}
 }

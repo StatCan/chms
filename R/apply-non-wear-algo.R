@@ -7,7 +7,7 @@
 #' @param max_exceptions Required: a length-one numeric vector representing the maximum number of epochs permitted within a bout that outside the range of the values in the `target_values` argument (default: 2).
 #' @param return Required: a character vector representing which vectors to return (default: "everything"). If set to "everything", the data frame in the `x` argument will be returned along with all vectors that were derived while applying the bout algorithm.
 #' @return Returns the data frame in the `x` argument along with all vectors that were derived while applying the bout algorithm.
-#' @examples \donttest{
+#' @examples
 #' # Initialize agd_worker R6 class
 #' agd_data <- agd_worker$new(
 #'   id = "jane-canuck",
@@ -15,7 +15,7 @@
 #'   agd_lfe = system.file("extdata", "jane-canuck-lfe.agd", package = "chms"),
 #'   agd_nml = system.file("extdata", "jane-canuck-nml.agd", package = "chms"),
 #'   epoch_length = 15,
-#'   day_max = 7,
+#'   day_max = 3,
 #'   sleep_algo = "barreira",
 #'   non_wear_algo = "barreira"
 #' )
@@ -41,7 +41,6 @@
 #'   max_exceptions = 2,
 #'   return = c("is_wearing", "is_sleeping", "ymd_hm")
 #' )
-#' }
 #' @export
 
 apply_non_wear_algo <- function(

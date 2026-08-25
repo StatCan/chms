@@ -16,7 +16,6 @@ Returns the \code{results} list from an \link{agd_worker} object.
 This function runs a job that processes ActiGraph data for a single participant by calling \code{agd_worker$new()$run()}. This function is used heavily by the \link{agd} R6 class.
 }
 \examples{
-\donttest{
 # Create meta data frame (external/non-statcan users)
 meta <- data.frame(
   id = c("jane-canuck", "john-canuck"),
@@ -40,7 +39,7 @@ agd_data <- agd$new(
   agd_lfe = meta$agd_lfe,
   agd_nml = meta$agd_nml,
   epoch_length = meta$epoch_length,
-  day_max = 7,
+  day_max = 3,
   sleep_algo = "barreira",
   non_wear_algo = "barreira",
   start_date = meta$start_date,
@@ -50,5 +49,4 @@ agd_data <- agd$new(
 # Run data processing pipeline (load, clean, classify and summarize data)
 # on first participant in agd_data
 lst <- run_agd_job(agd_data$jobs[1,])
-}
 }

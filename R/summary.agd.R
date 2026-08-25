@@ -5,7 +5,7 @@
 #' @param row_max Required (default: `10`): a length-one integer vector representing the number of rows of summary data to render to the console.
 #' @return Returns `NULL` invisibly.
 #' @method summary agd
-#' @examples \donttest{
+#' @examples
 #' # Create meta data frame (external/non-statcan users)
 #' meta <- data.frame(
 #'   id = c("jane-canuck", "john-canuck"),
@@ -29,11 +29,11 @@
 #'   agd_lfe = meta$agd_lfe,
 #'   agd_nml = meta$agd_nml,
 #'   epoch_length = meta$epoch_length,
-#'   day_max = 7,
+#'   day_max = 2,
 #'   sleep_algo = "barreira",
 #'   non_wear_algo = "barreira",
 #'   start_date = meta$start_date,
-#'   cpu_max = 2
+#'   cpu_max = 1
 #' )
 #'
 #' # Run data processing pipeline (load, clean, classify and summarize data)
@@ -41,7 +41,6 @@
 #'
 #' # Summarize data
 #' summary(agd_data)
-#' }
 #' @export
 
 summary.agd <- function(object, ..., row_max = 10) {

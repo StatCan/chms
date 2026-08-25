@@ -2,7 +2,7 @@
 #' @description This function classifies epochs in an ActiGraph `.agd` file.
 #' @param x Required: an [agd_worker] object.
 #' @return Returns `NULL` invisibly.
-#' @examples \donttest{
+#' @examples
 #' # Initialize agd_worker R6 class
 #' agd_data <- agd_worker$new(
 #'   id = "jane-canuck",
@@ -10,7 +10,7 @@
 #'   agd_lfe = system.file("extdata", "jane-canuck-lfe.agd", package = "chms"),
 #'   agd_nml = system.file("extdata", "jane-canuck-nml.agd", package = "chms"),
 #'   epoch_length = 15,
-#'   day_max = 7,
+#'   day_max = 3,
 #'   sleep_algo = "barreira",
 #'   non_wear_algo = "barreira"
 #' )
@@ -23,7 +23,6 @@
 #'
 #' # Store updated data
 #' dt <- agd_data$data$classify
-#' }
 #' @export
 
 classify_agd_data <- function(x) {

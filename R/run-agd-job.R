@@ -2,7 +2,7 @@
 #' @description This function runs a job that processes ActiGraph data for a single participant by calling `agd_worker$new()$run()`. This function is used heavily by the [agd] R6 class.
 #' @param x Required: a one-row tibble from an [agd] object `jobs` data structure.
 #' @return Returns the `results` list from an [agd_worker] object.
-#' @examples \donttest{
+#' @examples
 #' # Create meta data frame (external/non-statcan users)
 #' meta <- data.frame(
 #'   id = c("jane-canuck", "john-canuck"),
@@ -26,7 +26,7 @@
 #'   agd_lfe = meta$agd_lfe,
 #'   agd_nml = meta$agd_nml,
 #'   epoch_length = meta$epoch_length,
-#'   day_max = 7,
+#'   day_max = 3,
 #'   sleep_algo = "barreira",
 #'   non_wear_algo = "barreira",
 #'   start_date = meta$start_date,
@@ -36,7 +36,6 @@
 #' # Run data processing pipeline (load, clean, classify and summarize data)
 #' # on first participant in agd_data
 #' lst <- run_agd_job(agd_data$jobs[1,])
-#' }
 #' @export
 
 run_agd_job <- function(x) {

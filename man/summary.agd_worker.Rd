@@ -18,7 +18,6 @@ Returns \code{NULL} invisibly.
 This method renders summary tibbles for waking and sleeping hours from an \link{agd_worker} object to the console.
 }
 \examples{
-\donttest{
 # Initialize agd_worker R6 class
 agd_data <- agd_worker$new(
   id = "jane-canuck",
@@ -26,7 +25,7 @@ agd_data <- agd_worker$new(
   agd_lfe = system.file("extdata", "jane-canuck-lfe.agd", package = "chms"),
   agd_nml = system.file("extdata", "jane-canuck-nml.agd", package = "chms"),
   epoch_length = 15,
-  day_max = 7,
+  day_max = 3,
   sleep_algo = "barreira",
   non_wear_algo = "barreira"
 )
@@ -36,5 +35,4 @@ agd_data$run()
 
 # Summarize data
 summary(agd_data)
-}
 }

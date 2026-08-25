@@ -6,7 +6,7 @@
 #' @param start_date Optional: a length-one date vector (format: yyyy-mm-dd) representing the first day of data to load from `file`. If not set, data will be loaded from the first available day until `day_max` is reached.
 #' @param settings Optional: a tibble from `file` previously returned from [load_agd_settings()].
 #' @return Returns a tibble of the `data` table.
-#' @examples \donttest{
+#' @examples
 #' # Initialize agd_worker R6 class
 #' agd_data <- agd_worker$new(
 #'   id = "jane-canuck",
@@ -14,7 +14,7 @@
 #'   agd_lfe = system.file("extdata", "jane-canuck-lfe.agd", package = "chms"),
 #'   agd_nml = system.file("extdata", "jane-canuck-nml.agd", package = "chms"),
 #'   epoch_length = 15,
-#'   day_max = 7,
+#'   day_max = 3,
 #'   sleep_algo = "barreira",
 #'   non_wear_algo = "barreira"
 #' )
@@ -24,7 +24,6 @@
 #'   file = agd_data$args$agd_lfe,
 #'   start_date = agd_data$args$start_date
 #' )
-#' }
 #' @export
 
 load_agd_data <- function(file, col_select = "everything", day_max = 7, start_date, settings) {
@@ -34,11 +33,14 @@ load_agd_data <- function(file, col_select = "everything", day_max = 7, start_da
     dbname = file
   )
 
+  # Close connection to database on exit
+  on.exit(expr = DBI::dbDisconnect(conn = connection), add = TRUE)
+
   # Load settings
   if(missing(settings)) settings <- load_agd_settings(file)
 
   # Set start and stop dates
-  if(missing(start_date) | is.na(start_date)) start_date <- suppressWarnings(lubridate::date(settings$startdatetime))
+  if(missing(start_date) || is.na(start_date)) start_date <- suppressWarnings(lubridate::date(settings$startdatetime))
   stop_date <- start_date + day_max - 1
 
   # Get available dates
@@ -99,9 +101,6 @@ load_agd_data <- function(file, col_select = "everything", day_max = 7, start_da
       by = "ymd"
     ) |>
     dplyr::relocate(filter, epoch_length, midnight_day, ymd)
-
-  # Close connection to database
-  DBI::dbDisconnect(conn = connection)
 
   # Exit
   return(data)

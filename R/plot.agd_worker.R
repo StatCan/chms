@@ -7,7 +7,7 @@
 #' @param label_size Required (default: `3`): a length-one numeric vector representing the label font size.
 #' @return Returns a `ggplot2` object invisibly.
 #' @method plot agd_worker
-#' @examples \donttest{
+#' @examples
 #' # Initialize agd_worker R6 class
 #' agd_data <- agd_worker$new(
 #'   id = "jane-canuck",
@@ -15,7 +15,7 @@
 #'   agd_lfe = system.file("extdata", "jane-canuck-lfe.agd", package = "chms"),
 #'   agd_nml = system.file("extdata", "jane-canuck-nml.agd", package = "chms"),
 #'   epoch_length = 15,
-#'   day_max = 7,
+#'   day_max = 2,
 #'   sleep_algo = "barreira",
 #'   non_wear_algo = "barreira"
 #' )
@@ -25,7 +25,6 @@
 #'
 #' # Plot data
 #' plot(agd_data)
-#' }
 #' @export
 
 plot.agd_worker <- function(x, ..., title_size = 11, axis_size = 9, label_size = 3) {

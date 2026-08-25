@@ -39,7 +39,6 @@ Returns \code{x} along with all vectors that were derived while applying the Tud
 This function uses the Tudor-Locke algorithm (https://pubmed.ncbi.nlm.nih.gov/24383507) to classify an accelerometer axis vector of 60-second epochs as sleep time or awake time. This function was validated indirectly against output from the official SAS version of the Barreira algorithm (www.pbrc.edu/pdf/PBRCSleepEpisodeTimeMacroCode.pdf).
 }
 \examples{
-\donttest{
 # Initialize agd_worker R6 class
 agd_data <- agd_worker$new(
   id = "jane-canuck",
@@ -47,7 +46,7 @@ agd_data <- agd_worker$new(
   agd_lfe = system.file("extdata", "jane-canuck-lfe.agd", package = "chms"),
   agd_nml = system.file("extdata", "jane-canuck-nml.agd", package = "chms"),
   epoch_length = 15,
-  day_max = 7,
+  day_max = 3,
   sleep_algo = "barreira",
   non_wear_algo = "barreira"
 )
@@ -63,5 +62,4 @@ dt <- apply_tudor_locke_algo(
       filter == "LowFrequencyExtension"
     )
 )
-}
 }
