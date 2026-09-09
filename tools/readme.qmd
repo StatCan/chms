@@ -75,11 +75,11 @@ For more details on the methods used in the **chms** R package, see Clarke J, Gr
 ## Installation
 
 ```{r, eval = FALSE}
-remotes::install_git(
-  url = "https://github.com/statcan/chms",
-  force = TRUE,
-  upgrade = "never"
-)
+# Install official release (CRAN)
+install.packages("chms")
+
+# Install development version (GitHub)
+pak::pak("statcan/chms")
 ```
 
 ## Usage
@@ -290,11 +290,11 @@ R. <a href="https://www150.statcan.gc.ca/n1/pub/82-003-x/2026002/article/00001-f
 ## L'installation
 
 ```{r, eval = FALSE}
-remotes::install_git(
-  url = "https://github.com/statcan/chms",
-  force = TRUE,
-  upgrade = "never"
-)
+# Install official release (CRAN)
+install.packages("chms")
+
+# Install development version (GitHub)
+pak::pak("statcan/chms")
 ```
 
 ## Utilisation

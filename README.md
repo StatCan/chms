@@ -71,11 +71,11 @@ GT3X-BT and Actical accelerometers</a>. Health Rep. 2026 Feb
 ## Installation
 
 ``` r
-remotes::install_git(
-  url = "https://github.com/statcan/chms",
-  force = TRUE,
-  upgrade = "never"
-)
+# Install official release (CRAN)
+install.packages("chms")
+
+# Install development version (GitHub)
+pak::pak("statcan/chms")
 ```
 
 ## Usage
@@ -163,7 +163,7 @@ agd_data
 #> # A tibble: 1 × 4
 #>   method timestamp           status  message
 #>   <chr>  <dttm>              <chr>   <chr>  
-#> 1 new()  2026-08-25 19:22:40 success ""
+#> 1 new()  2026-09-08 20:46:27 success ""
 ```
 
 ``` r
@@ -185,7 +185,7 @@ agd_data$export(dir = tempdir())
 #> 
 #> ── 🍁chms::agd$export() method ──
 #> 
-#> ℹ Exporting results to 'C:\Users\Clippy\AppData\Local\Temp\Rtmp0kKTmq/agd-run-2026-08-25-19-22-48-815256'.
+#> ℹ Exporting results to 'C:\Users\Clippy\AppData\Local\Temp\Rtmp0EFeGk/agd-run-2026-09-08-20-46-34-989392'.
 #> 
 #> ✔ Done!
 ```
@@ -196,7 +196,7 @@ agd_data$export(dir = tempdir(), stc = TRUE)
 #> 
 #> ── 🍁chms::agd$export() method ──
 #> 
-#> ℹ Exporting `self$results$summary_full_stc` and `self$results$summary_run` to 'C:\Users\Clippy\AppData\Local\Temp\Rtmp0kKTmq'.
+#> ℹ Exporting `self$results$summary_full_stc` and `self$results$summary_run` to 'C:\Users\Clippy\AppData\Local\Temp\Rtmp0EFeGk'.
 #> 
 #> ✔ Done!
 ```
@@ -221,8 +221,8 @@ agd_data
 #> # A tibble: 2 × 4
 #>   method timestamp           status  message
 #>   <chr>  <dttm>              <chr>   <chr>  
-#> 1 new()  2026-08-25 19:22:40 success ""     
-#> 2 run()  2026-08-25 19:22:48 success ""
+#> 1 new()  2026-09-08 20:46:27 success ""     
+#> 2 run()  2026-09-08 20:46:34 success ""
 ```
 
 ``` r
@@ -238,6 +238,7 @@ plot(agd_data, id = "jane-canuck")
 style="width: 75%;" />
 
 
+    #> 
     #> ✔ Done!
 
 ``` r
@@ -413,11 +414,11 @@ Représentant de la santé 2026 févr. 18; 37(2):3-15. DOI :
 ## L’installation
 
 ``` r
-remotes::install_git(
-  url = "https://github.com/statcan/chms",
-  force = TRUE,
-  upgrade = "never"
-)
+# Install official release (CRAN)
+install.packages("chms")
+
+# Install development version (GitHub)
+pak::pak("statcan/chms")
 ```
 
 ## Utilisation
@@ -505,7 +506,7 @@ agd_data
 #> # A tibble: 1 × 4
 #>   method timestamp           status  message
 #>   <chr>  <dttm>              <chr>   <chr>  
-#> 1 new()  2026-08-25 19:23:04 success ""
+#> 1 new()  2026-09-08 20:46:49 success ""
 ```
 
 ``` r
@@ -527,7 +528,7 @@ agd_data$export(dir = tempdir())
 #> 
 #> ── 🍁chms::agd$export() method ──
 #> 
-#> ℹ Exporting results to 'C:\Users\Clippy\AppData\Local\Temp\Rtmp0kKTmq/agd-run-2026-08-25-19-23-11-65182'.
+#> ℹ Exporting results to 'C:\Users\Clippy\AppData\Local\Temp\Rtmp0EFeGk/agd-run-2026-09-08-20-46-56-780651'.
 #> 
 #> ✔ Done!
 ```
@@ -538,7 +539,7 @@ agd_data$export(dir = tempdir(), stc = TRUE)
 #> 
 #> ── 🍁chms::agd$export() method ──
 #> 
-#> ℹ Exporting `self$results$summary_full_stc` and `self$results$summary_run` to 'C:\Users\Clippy\AppData\Local\Temp\Rtmp0kKTmq'.
+#> ℹ Exporting `self$results$summary_full_stc` and `self$results$summary_run` to 'C:\Users\Clippy\AppData\Local\Temp\Rtmp0EFeGk'.
 #> 
 #> ✔ Done!
 ```
@@ -563,8 +564,8 @@ agd_data
 #> # A tibble: 2 × 4
 #>   method timestamp           status  message
 #>   <chr>  <dttm>              <chr>   <chr>  
-#> 1 new()  2026-08-25 19:23:04 success ""     
-#> 2 run()  2026-08-25 19:23:11 success ""
+#> 1 new()  2026-09-08 20:46:49 success ""     
+#> 2 run()  2026-09-08 20:46:56 success ""
 ```
 
 ``` r
@@ -580,6 +581,7 @@ plot(agd_data, id = "jane-canuck")
 style="width: 75%;" />
 
 
+    #> 
     #> ✔ Done!
 
 ``` r
