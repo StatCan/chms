@@ -9,19 +9,24 @@
 \arguments{
 \item{x}{Required: an \link{agd_worker} object.}
 
-\item{...}{Optional: arguments to be passed to methods. \strong{Note:} currently not used.}
+\item{...}{Optional: arguments to be passed to methods. \strong{Note:} currently
+not used.}
 
-\item{title_size}{Required (default: \code{11}): a length-one numeric vector representing the title font size.}
+\item{title_size}{Required (default: \code{11}): a length-one numeric vector
+representing the title font size.}
 
-\item{axis_size}{Required (default: \code{9}): a length-one numeric vector representing the axis font size .}
+\item{axis_size}{Required (default: \code{9}): a length-one numeric vector
+representing the axis font size .}
 
-\item{label_size}{Required (default: \code{3}): a length-one numeric vector representing the label font size.}
+\item{label_size}{Required (default: \code{3}): a length-one numeric vector
+representing the label font size.}
 }
 \value{
 Returns a \code{ggplot2} object invisibly.
 }
 \description{
-This method renders a scatter plot using results from an \link{agd_worker} object.
+This method renders a scatter plot using results from an
+\link{agd_worker} object.
 }
 \examples{
 # Initialize agd_worker R6 class

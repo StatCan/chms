@@ -9,15 +9,19 @@
 \arguments{
 \item{x}{Required: an \link{agd} object.}
 
-\item{...}{Optional: arguments to be passed to methods. \strong{Note:} currently not used.}
+\item{...}{Optional: arguments to be passed to methods. \strong{Note:} currently
+not used.}
 
-\item{id}{Optional: a vector representing participant IDs in \code{x} for which to render scatter plots. If \code{id} is unset, scatter plots for all participants in \code{x} will be rendered iteratively.}
+\item{id}{Optional: a vector representing participant IDs in \code{x} for which
+to render scatter plots. If \code{id} is unset, scatter plots for all participants
+in \code{x} will be rendered iteratively.}
 }
 \value{
 Returns \code{ggplot2} objects invisibly.
 }
 \description{
-This method renders scatter plots iteratively and interactively using results from an \link{agd} object.
+This method renders scatter plots iteratively and interactively
+using results from an \link{agd} object.
 }
 \examples{
 # Initialize agd R6 class

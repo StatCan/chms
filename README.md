@@ -1,7 +1,9 @@
 
 
 <details open>
+
 <summary>
+
 English
 </summary>
 
@@ -72,7 +74,7 @@ GT3X-BT and Actical accelerometers</a>. Health Rep. 2026 Feb
 
 ``` r
 # Install official release (CRAN)
-install.packages("chms")
+pak::pak("chms")
 
 # Install development version (GitHub)
 pak::pak("statcan/chms")
@@ -109,8 +111,8 @@ glimpse(meta)
 #> Columns: 6
 #> $ id           <chr> "jane-canuck", "john-canuck"
 #> $ age          <dbl> 10, 40
-#> $ agd_lfe      <chr> "C:/Users/Clippy/AppData/Local/R/win-library/4.4/chms/ex…
-#> $ agd_nml      <chr> "C:/Users/Clippy/AppData/Local/R/win-library/4.4/chms/ex…
+#> $ agd_lfe      <chr> "C:/Users/Clippy/AppData/Local/R/win-library/4.6/chms/ex…
+#> $ agd_nml      <chr> "C:/Users/Clippy/AppData/Local/R/win-library/4.6/chms/ex…
 #> $ start_date   <chr> "2021-05-30", "2021-05-27"
 #> $ epoch_length <dbl> 15, 60
 ```
@@ -163,7 +165,7 @@ agd_data
 #> # A tibble: 1 × 4
 #>   method timestamp           status  message
 #>   <chr>  <dttm>              <chr>   <chr>  
-#> 1 new()  2026-09-08 20:46:27 success ""
+#> 1 new()  2026-10-05 13:17:31 success ""
 ```
 
 ``` r
@@ -185,7 +187,7 @@ agd_data$export(dir = tempdir())
 #> 
 #> ── 🍁chms::agd$export() method ──
 #> 
-#> ℹ Exporting results to 'C:\Users\Clippy\AppData\Local\Temp\Rtmp0EFeGk/agd-run-2026-09-08-20-46-34-989392'.
+#> ℹ Exporting results to 'C:\Users\Clippy\AppData\Local\Temp\Rtmp8gHkW5/agd-run-2026-10-05-13-17-39-496406'.
 #> 
 #> ✔ Done!
 ```
@@ -196,7 +198,7 @@ agd_data$export(dir = tempdir(), stc = TRUE)
 #> 
 #> ── 🍁chms::agd$export() method ──
 #> 
-#> ℹ Exporting `self$results$summary_full_stc` and `self$results$summary_run` to 'C:\Users\Clippy\AppData\Local\Temp\Rtmp0EFeGk'.
+#> ℹ Exporting `self$results$summary_full_stc` and `self$results$summary_run` to 'C:\Users\Clippy\AppData\Local\Temp\Rtmp8gHkW5'.
 #> 
 #> ✔ Done!
 ```
@@ -221,8 +223,8 @@ agd_data
 #> # A tibble: 2 × 4
 #>   method timestamp           status  message
 #>   <chr>  <dttm>              <chr>   <chr>  
-#> 1 new()  2026-09-08 20:46:27 success ""     
-#> 2 run()  2026-09-08 20:46:34 success ""
+#> 1 new()  2026-10-05 13:17:31 success ""     
+#> 2 run()  2026-10-05 13:17:39 success ""
 ```
 
 ``` r
@@ -337,9 +339,13 @@ citation("chms")
 ```
 
 </details>
+
 <hr style="border: 3px solid grey; height: 4px">
+
 <details open>
+
 <summary>
+
 Français
 </summary>
 
@@ -415,7 +421,7 @@ Représentant de la santé 2026 févr. 18; 37(2):3-15. DOI :
 
 ``` r
 # Install official release (CRAN)
-install.packages("chms")
+pak::pak("chms")
 
 # Install development version (GitHub)
 pak::pak("statcan/chms")
@@ -506,7 +512,7 @@ agd_data
 #> # A tibble: 1 × 4
 #>   method timestamp           status  message
 #>   <chr>  <dttm>              <chr>   <chr>  
-#> 1 new()  2026-09-08 20:46:49 success ""
+#> 1 new()  2026-10-05 13:17:54 success ""
 ```
 
 ``` r
@@ -528,7 +534,7 @@ agd_data$export(dir = tempdir())
 #> 
 #> ── 🍁chms::agd$export() method ──
 #> 
-#> ℹ Exporting results to 'C:\Users\Clippy\AppData\Local\Temp\Rtmp0EFeGk/agd-run-2026-09-08-20-46-56-780651'.
+#> ℹ Exporting results to 'C:\Users\Clippy\AppData\Local\Temp\Rtmp8gHkW5/agd-run-2026-10-05-13-18-01-691848'.
 #> 
 #> ✔ Done!
 ```
@@ -539,7 +545,7 @@ agd_data$export(dir = tempdir(), stc = TRUE)
 #> 
 #> ── 🍁chms::agd$export() method ──
 #> 
-#> ℹ Exporting `self$results$summary_full_stc` and `self$results$summary_run` to 'C:\Users\Clippy\AppData\Local\Temp\Rtmp0EFeGk'.
+#> ℹ Exporting `self$results$summary_full_stc` and `self$results$summary_run` to 'C:\Users\Clippy\AppData\Local\Temp\Rtmp8gHkW5'.
 #> 
 #> ✔ Done!
 ```
@@ -564,8 +570,8 @@ agd_data
 #> # A tibble: 2 × 4
 #>   method timestamp           status  message
 #>   <chr>  <dttm>              <chr>   <chr>  
-#> 1 new()  2026-09-08 20:46:49 success ""     
-#> 2 run()  2026-09-08 20:46:56 success ""
+#> 1 new()  2026-10-05 13:17:54 success ""     
+#> 2 run()  2026-10-05 13:18:01 success ""
 ```
 
 ``` r

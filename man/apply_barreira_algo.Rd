@@ -2,7 +2,8 @@
 % Please edit documentation in R/apply-barreira-algo.R
 \name{apply_barreira_algo}
 \alias{apply_barreira_algo}
-\title{Classify an accelerometer axis vector of 60-second epochs as sleep time or awake time.}
+\title{Classify an accelerometer axis vector of 60-second epochs as sleep
+time or awake time.}
 \usage{
 apply_barreira_algo(
   x,
@@ -19,27 +20,48 @@ apply_barreira_algo(
 \arguments{
 \item{x}{Required: a data frame of accelerometer data in 60-second epochs.}
 
-\item{time_stamp}{Required (default "\code{dateTimestamp}"): a length-one character vector representing the name of the timestamp vector.}
+\item{time_stamp}{Required (default "\code{dateTimestamp}"): a length-one
+character vector representing the name of the timestamp vector.}
 
-\item{axis1}{Required (default: "\code{axis1}"): a length-one character vector representing the name of the vertical axis.}
+\item{axis1}{Required (default: "\code{axis1}"): a length-one character vector
+representing the name of the vertical axis.}
 
-\item{incline_off}{Required (default: "\code{inclineOff}"): a length-one character vector representing the name of the corresponding vector in an ActiGraph .agd file.}
+\item{incline_off}{Required (default: "\code{inclineOff}"): a length-one
+character vector representing the name of the corresponding vector in an
+ActiGraph .agd file.}
 
-\item{incline_standing}{Required (default: "\code{inclineStanding}"): a length-one character vector representing the name of the corresponding vector in an ActiGraph .agd file.}
+\item{incline_standing}{Required (default: "\code{inclineStanding}"): a
+length-one character vector representing the name of the corresponding
+vector in an ActiGraph .agd file.}
 
-\item{incline_sitting}{Required (default: "\code{inclineSitting}"): a length-one character vector representing the name of the corresponding vector in an ActiGraph .agd file.}
+\item{incline_sitting}{Required (default: "\code{inclineSitting}"): a length-one
+character vector representing the name of the corresponding vector in an
+ActiGraph .agd file.}
 
-\item{incline_lying}{Required (default: "\code{inclineLying}"): a length-one character vector representing the name of the corresponding vector in an ActiGraph .agd file.}
+\item{incline_lying}{Required (default: "\code{inclineLying}"): a length-one
+character vector representing the name of the corresponding vector in an
+ActiGraph .agd file.}
 
-\item{age}{Required: a length-one integer vector representing the participant's age in years. This parameter is used to determine when the first sleep bout can begin. Statistics Canada sets the time to 18:00 for participants under five years and younger, and 19:00 for all other ages.}
+\item{age}{Required: a length-one integer vector representing the
+participant's age in years. This parameter is used to determine when the
+first sleep bout can begin. Statistics Canada sets the time to 18:00 for
+participants under five years and younger, and 19:00 for all other ages.}
 
-\item{return}{Required (default: "\code{everything}"): a character vector representing which vectors in \code{x} to return. If set to "\code{everything}", the data frame in \code{x} will be returned along with all vectors that were derived while applying the Barreira algorithm.}
+\item{return}{Required (default: "\code{everything}"): a character vector
+representing which vectors in \code{x} to return. If set to "\code{everything}", the
+data frame in \code{x} will be returned along with all vectors that were derived
+while applying the Barreira algorithm.}
 }
 \value{
-Returns the data frame \code{x} along with all vectors that were derived while applying the Barreira algorithm.
+Returns the data frame \code{x} along with all vectors that were derived
+while applying the Barreira algorithm.
 }
 \description{
-This function uses the Barreira algorithm (pubmed.ncbi.nlm.nih.gov/25202840) to classify an accelerometer axis vector of 60-second epochs as sleep time or awake time. This function was validated against output from the official SAS version of the algorithm (www.pbrc.edu/pdf/PBRCSleepEpisodeTimeMacroCode.pdf).
+This function uses the Barreira algorithm
+(pubmed.ncbi.nlm.nih.gov/25202840) to classify an accelerometer axis vector
+of 60-second epochs as sleep time or awake time. This function was validated
+against output from the official SAS version of the algorithm
+(www.pbrc.edu/pdf/PBRCSleepEpisodeTimeMacroCode.pdf).
 }
 \examples{
 # Initialize agd_worker R6 class

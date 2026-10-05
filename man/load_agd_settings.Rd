@@ -7,13 +7,15 @@
 load_agd_settings(file)
 }
 \arguments{
-\item{file}{Required: a length-one character vector representing the full path to an \code{.agd} file.}
+\item{file}{Required: a length-one character vector representing the full
+path to an \code{.agd} file.}
 }
 \value{
 Returns a tibble of the \code{settings} table in a wide shape.
 }
 \description{
-This function loads the \code{settings} table from an ActiGraph \code{.agd} file.
+This function loads the \code{settings} table from an ActiGraph
+\code{.agd} file.
 }
 \examples{
 # Initialize agd_worker R6 class

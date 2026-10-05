@@ -16,24 +16,33 @@ get_chms_meta(
 )
 }
 \arguments{
-\item{clinic_file}{Required: a length-one character vector representing the full path to the clinic file. Note: a \code{.sas7bdat} file is expected.}
+\item{clinic_file}{Required: a length-one character vector representing the
+full path to the clinic file. Note: a \code{.sas7bdat} file is expected.}
 
-\item{agd_dir}{Required: a character vector representing the full path(s) to the site directory ("full/path/to/data/site").}
+\item{agd_dir}{Required: a character vector representing the full path(s) to
+the site directory ("full/path/to/data/site").}
 
-\item{clinic_id}{Required (default: \code{"CLINICID"}): a length-one character vector representing the clinic ID vector name in \code{clinic_file}.}
+\item{clinic_id}{Required (default: \code{"CLINICID"}): a length-one character
+vector representing the clinic ID vector name in \code{clinic_file}.}
 
-\item{site}{Required (default: \code{"SITE"}): a length-one character vector representing the site vector name in \code{clinic_file}.}
+\item{site}{Required (default: \code{"SITE"}): a length-one character vector
+representing the site vector name in \code{clinic_file}.}
 
-\item{age}{Required (default: \code{"CLC_AGE"}): a length-one character vector representing the age vector name in \code{clinic_file}.}
+\item{age}{Required (default: \code{"CLC_AGE"}): a length-one character vector
+representing the age vector name in \code{clinic_file}.}
 
-\item{day}{Required (default: \code{"V2_DAY"}): a length-one character vector representing the day vector name of the MEC visit date in \code{clinic_file}.}
+\item{day}{Required (default: \code{"V2_DAY"}): a length-one character vector
+representing the day vector name of the MEC visit date in \code{clinic_file}.}
 
-\item{month}{Required (default: \code{"V2_MTH"}): a length-one character vector representing the month vector name of the MEC visit date in \code{clinic_file}.}
+\item{month}{Required (default: \code{"V2_MTH"}): a length-one character vector
+representing the month vector name of the MEC visit date in \code{clinic_file}.}
 
-\item{year}{Required (default: \code{"V2_YEAR"}): a length-one character vector representing the year vector name of the MEC visit date in \code{clinic_file}.}
+\item{year}{Required (default: \code{"V2_YEAR"}): a length-one character vector
+representing the year vector name of the MEC visit date in \code{clinic_file}.}
 }
 \value{
-Returns a tibble with eight vectors (\code{id}, \code{age}, \code{site}, \code{agd_lfe}, \code{agd_nml}, \code{mec_visit_date}, \code{start_date}, \code{epoch_length}).
+Returns a tibble with eight vectors (\code{id}, \code{age}, \code{site}, \code{agd_lfe},
+\code{agd_nml}, \code{mec_visit_date}, \code{start_date}, \code{epoch_length}).
 }
 \description{
 This function gets CHMS participant metadata.

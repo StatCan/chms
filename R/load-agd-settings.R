@@ -1,6 +1,8 @@
 #' @title Load the `settings` table from an ActiGraph `.agd` file.
-#' @description This function loads the `settings` table from an ActiGraph `.agd` file.
-#' @param file Required: a length-one character vector representing the full path to an `.agd` file.
+#' @description This function loads the `settings` table from an ActiGraph
+#' `.agd` file.
+#' @param file Required: a length-one character vector representing the full
+#' path to an `.agd` file.
 #' @return Returns a tibble of the `settings` table in a wide shape.
 #' @examples
 #' # Initialize agd_worker R6 class
@@ -58,5 +60,5 @@ load_agd_settings <- function(file) {
     )
 
   # Exit
-  return(settings)
+  settings
 }

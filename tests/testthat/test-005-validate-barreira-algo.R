@@ -17,13 +17,13 @@ test_that("Barreira algo in R matches Barreira algo in SAS", {
     y <- y + ifelse(lubridate::hour(y) <= 11, 86400, 0)
 
     # Exit
-    return(as.numeric(abs(difftime(x, y, units = "mins"))))
+    as.numeric(abs(difftime(x, y, units = "mins")))
   }
 
   compare_sleep <- function(id, tolerance = 5) {
     # Get SAS case data and format
     sas_case <- sas |>
-      dplyr::filter(pid == {id}) |>
+      dplyr::filter(pid == .env$id) |>
       dplyr::mutate(
         day = substr(x = tolower(weekdays(date)), start = 1, stop = 3),
         dplyr::across(
@@ -32,8 +32,20 @@ test_that("Barreira algo in R matches Barreira algo in SAS", {
         )
       ) |>
       dplyr::select(-date, -noon, -paxday) |>
-      dplyr::rename(sleep_period_time = tot_sleepnw, total_wake_episode_time = tot_nw, total_sleep_episode_time = tot_sleep) |>
-      dplyr::relocate(pid, day, bedtime, waketime, sleep_period_time, total_wake_episode_time, total_sleep_episode_time) |>
+      dplyr::rename(
+        sleep_period_time = tot_sleepnw,
+        total_wake_episode_time = tot_nw,
+        total_sleep_episode_time = tot_sleep
+      ) |>
+      dplyr::relocate(
+        pid,
+        day,
+        bedtime,
+        waketime,
+        sleep_period_time,
+        total_wake_episode_time,
+        total_sleep_episode_time
+      ) |>
       tidyr::pivot_longer(
         cols = bedtime:total_sleep_episode_time,
         names_to = "variable",
@@ -42,8 +54,15 @@ test_that("Barreira algo in R matches Barreira algo in SAS", {
 
     # Get R case data and format
     r_case <- r |>
-      dplyr::filter(participant_id == {id}, day > 0, day < 7) |>
-      dplyr::select(participant_id, day_of_week, nocturnal_sleep_onset:nocturnal_sleep_offset, sleep_period_time, total_wake_episode_time, total_sleep_episode_time) |>
+      dplyr::filter(participant_id == .env$id, day > 0, day < 7) |>
+      dplyr::select(
+        participant_id,
+        day_of_week,
+        nocturnal_sleep_onset:nocturnal_sleep_offset,
+        sleep_period_time,
+        total_wake_episode_time,
+        total_sleep_episode_time
+      ) |>
       dplyr::rename(
         pid = 1,
         day = 2,
@@ -56,7 +75,8 @@ test_that("Barreira algo in R matches Barreira algo in SAS", {
           .cols = bedtime:waketime,
           .fns = ~ stringr::str_extract(
             string = ifelse(
-              test = ! is.na(.x) & ! stringr::str_detect(string = .x, pattern = ":"),
+              test = ! is.na(.x) &
+                ! stringr::str_detect(string = .x, pattern = ":"),
               yes = paste(.x, "00:00:00"),
               no = .x
             ),
@@ -76,12 +96,31 @@ test_that("Barreira algo in R matches Barreira algo in SAS", {
 
     # Join data
     case <- sas_case |>
-      dplyr::filter(! variable %in% c("total_wake_episode_time", "sleep_period_time")) |>
-      dplyr::mutate(variable = ifelse(variable == "total_sleep_episode_time", "tot_sleep vs. sleep_period_time", variable)) |>
+      dplyr::filter(
+        ! variable %in% c("total_wake_episode_time", "sleep_period_time")
+      ) |>
+      dplyr::mutate(
+        variable = ifelse(
+          test = variable == "total_sleep_episode_time",
+          yes = "tot_sleep vs. sleep_period_time",
+          no = variable
+        )
+      ) |>
       dplyr::left_join(
         y = r_case |>
-          dplyr::filter(! variable %in% c("total_wake_episode_time", "total_sleep_episode_time")) |>
-          dplyr::mutate(variable = ifelse(variable == "sleep_period_time", "tot_sleep vs. sleep_period_time", variable)),
+          dplyr::filter(
+            ! variable %in% c(
+              "total_wake_episode_time",
+              "total_sleep_episode_time"
+            )
+          ) |>
+          dplyr::mutate(
+            variable = ifelse(
+              test = variable == "sleep_period_time",
+              yes = "tot_sleep vs. sleep_period_time",
+              no = variable
+            )
+          ),
         by = c("pid", "day", "variable")
       ) |>
       dplyr::rowwise() |>
@@ -89,8 +128,15 @@ test_that("Barreira algo in R matches Barreira algo in SAS", {
         delta = dplyr::case_when(
           sum(is.na(c(sas_value, r_value))) == 2 ~ NA,
           sum(is.na(c(sas_value, r_value))) == 1 ~ 24,
-          variable %in% c("bedtime", "waketime") ~ compare_times(sas_value, r_value),
-          variable %in% c("sleep_period_time", "total_wake_episode_time", "total_sleep_episode_time") ~ suppressWarnings(abs(as.numeric(sas_value) - as.numeric(r_value))),
+          variable %in% c("bedtime", "waketime") ~
+            compare_times(sas_value, r_value),
+          variable %in% c(
+            "sleep_period_time",
+            "total_wake_episode_time",
+            "total_sleep_episode_time"
+          ) ~ suppressWarnings(
+            abs(as.numeric(sas_value) - as.numeric(r_value))
+          ),
           TRUE ~ NA
         ),
         delta = ifelse(
@@ -100,8 +146,19 @@ test_that("Barreira algo in R matches Barreira algo in SAS", {
         ),
         delta = dplyr::case_when(
           delta == "NA" ~ delta,
-          as.numeric(delta) > tolerance & as.numeric(delta) == 24 ~ paste0("<span style='background: red; color: white; font-weight: bold; height: 100%; width: 100%;'>", paste0(sprintf(fmt = "%.0f", tolerance), "+"), "</span>"),
-          as.numeric(delta) > tolerance ~ paste0("<span style='background: red; color: white; font-weight: bold; height: 100%; width: 100%;'>", delta, "</span>"),
+          as.numeric(delta) > tolerance & as.numeric(delta) == 24 ~
+            paste0(
+              "<span style='background: red; color: white; ",
+              "font-weight: bold; height: 100%; width: 100%;'>",
+              paste0(sprintf(fmt = "%.0f", tolerance), "+"),
+              "</span>"
+            ),
+          as.numeric(delta) > tolerance ~ paste0(
+            "<span style='background: red; color: white; ",
+            "font-weight: bold; height: 100%; width: 100%;'>",
+            delta,
+            "</span>"
+          ),
           TRUE ~ delta
         ),
         dplyr::across(
@@ -116,18 +173,22 @@ test_that("Barreira algo in R matches Barreira algo in SAS", {
       dplyr::arrange(day)
 
     # Exit
-    return(
-      list(
-        meta = dplyr::tibble(
-          id = unique(case$pid),
-          delta_days = length(unique(case$day[stringr::str_detect(string = case$delta, pattern = "</span>")])),
-          total_days = length(unique(case$day))
+    list(
+      meta = dplyr::tibble(
+        id = unique(case$pid),
+        delta_days = length(
+          unique(
+            case$day[
+              stringr::str_detect(string = case$delta, pattern = "</span>")
+            ]
+          )
         ),
-        data = case,
-        log = r |>
-          dplyr::filter(summary == "Sleeping hours", participant_id == id) |>
-          dplyr::pull(sleep_episode_log)
-      )
+        total_days = length(unique(case$day))
+      ),
+      data = case,
+      log = r |>
+        dplyr::filter(summary == "Sleeping hours", participant_id == id) |>
+        dplyr::pull(sleep_episode_log)
     )
   }
 
@@ -152,8 +213,12 @@ test_that("Barreira algo in R matches Barreira algo in SAS", {
     dplyr::rename(id = 1, age = 2) |>
     dplyr::filter(site == 2) |>
     dplyr::mutate(
-      agd_lfe = paste0(config::get("cycle7_site2_agd_dir_lfe"), "/", id, "15sec.agd"),
-      agd_nml = paste0(config::get("cycle7_site2_agd_dir_nml"), "/", id, "15sec.agd"),
+      agd_lfe = paste0(
+        config::get("cycle7_site2_agd_dir_lfe"), "/", id, "15sec.agd"
+      ),
+      agd_nml = paste0(
+        config::get("cycle7_site2_agd_dir_nml"), "/", id, "15sec.agd"
+      ),
       epoch_length = dplyr::case_when(
         age >= 18 ~ 60,
         age >= 3 ~ 15,

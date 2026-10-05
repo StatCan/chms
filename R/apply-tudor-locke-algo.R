@@ -1,14 +1,33 @@
-#' @title Classify an accelerometer axis vector of 60-second epochs as sleep time or awake time.
-#' @description This function uses the Tudor-Locke algorithm (https://pubmed.ncbi.nlm.nih.gov/24383507) to classify an accelerometer axis vector of 60-second epochs as sleep time or awake time. This function was validated indirectly against output from the official SAS version of the Barreira algorithm (www.pbrc.edu/pdf/PBRCSleepEpisodeTimeMacroCode.pdf).
+#' @title Classify an accelerometer axis vector of 60-second epochs as sleep
+#' time or awake time.
+#' @description This function uses the Tudor-Locke algorithm
+#' (https://pubmed.ncbi.nlm.nih.gov/24383507) to classify an accelerometer
+#' axis vector of 60-second epochs as sleep time or awake time. This function
+#' was validated indirectly against output from the official SAS version of the
+#' Barreira algorithm (www.pbrc.edu/pdf/PBRCSleepEpisodeTimeMacroCode.pdf).
 #' @param x Required: a data frame of accelerometer data in 60-second epochs.
-#' @param time_stamp Required (default: `"dataTimestamp"`): a length-one character vector representing the name of the time stamp vector.
-#' @param axis1 Required (default: `"axis1"`): a length-one character vector representing the name of the vertical axis.
-#' @param incline_off Required (default: `"inclineOff"`): a length-one character vector representing the name of the corresponding vector in an ActiGraph `.agd` file.
-#' @param incline_standing Required (default: `"inclineStanding"`): a length-one character vector representing the name of the corresponding vector in an ActiGraph `.agd` file.
-#' @param incline_sitting Required (default: `"inclineSitting"`): a length-one character vector representing the name of the corresponding vector in an ActiGraph `.agd` file.
-#' @param incline_lying Required (default: `"inclineLying"`): a length-one character vector representing the name of the corresponding vector in an ActiGraph `.agd` file.
-#' @param return Required (default: `"everything"`): a character vector representing which vectors to return. If set to "everything", the data frame in `x` will be returned along with all vectors that were derived while applying the Tudor-Locke algorithm.
-#' @return Returns `x` along with all vectors that were derived while applying the Tudor-Locke algorithm.
+#' @param time_stamp Required (default: `"dataTimestamp"`): a length-one
+#' character vector representing the name of the time stamp vector.
+#' @param axis1 Required (default: `"axis1"`): a length-one character vector
+#' representing the name of the vertical axis.
+#' @param incline_off Required (default: `"inclineOff"`): a length-one
+#' character vector representing the name of the corresponding vector in an
+#' ActiGraph `.agd` file.
+#' @param incline_standing Required (default: `"inclineStanding"`): a
+#' length-one character vector representing the name of the corresponding
+#' vector in an ActiGraph `.agd` file.
+#' @param incline_sitting Required (default: `"inclineSitting"`): a length-one
+#' character vector representing the name of the corresponding vector in an
+#' ActiGraph `.agd` file.
+#' @param incline_lying Required (default: `"inclineLying"`): a length-one
+#' character vector representing the name of the corresponding vector in an
+#' ActiGraph `.agd` file.
+#' @param return Required (default: `"everything"`): a character vector
+#' representing which vectors to return. If set to "everything", the data frame
+#' in `x` will be returned along with all vectors that were derived while
+#' applying the Tudor-Locke algorithm.
+#' @return Returns `x` along with all vectors that were derived while applying
+#' the Tudor-Locke algorithm.
 #' @examples
 #' # Initialize agd_worker R6 class
 #' agd_data <- agd_worker$new(
@@ -36,14 +55,14 @@
 #' @export
 
 apply_tudor_locke_algo <- function(
-    x,
-    time_stamp = "dataTimestamp",
-    axis1 = "axis1",
-    incline_off = "inclineOff",
-    incline_standing = "inclineStanding",
-    incline_sitting = "inclineSitting",
-    incline_lying = "inclineLying",
-    return = "everything"
+  x,
+  time_stamp = "dataTimestamp",
+  axis1 = "axis1",
+  incline_off = "inclineOff",
+  incline_standing = "inclineStanding",
+  incline_sitting = "inclineSitting",
+  incline_lying = "inclineLying",
+  return = "everything"
 ) {
   # Rename vectors
   x <- x |>
@@ -65,10 +84,18 @@ apply_tudor_locke_algo <- function(
     dplyr::mutate(
       # Compute inclinometer classification per Barreira
       inclinometer = dplyr::case_when(
-        incline_lying == pmax(incline_off, incline_standing, incline_sitting, incline_lying) ~ 2,
-        incline_sitting == pmax(incline_off, incline_standing, incline_sitting, incline_lying) ~ 3,
-        incline_standing == pmax(incline_off, incline_standing, incline_sitting, incline_lying) ~ 1,
-        incline_off == pmax(incline_off, incline_standing, incline_sitting, incline_lying) ~ 0,
+        incline_lying == pmax(
+          incline_off, incline_standing, incline_sitting, incline_lying
+        ) ~ 2,
+        incline_sitting == pmax(
+          incline_off, incline_standing, incline_sitting, incline_lying
+        ) ~ 3,
+        incline_standing == pmax(
+          incline_off, incline_standing, incline_sitting, incline_lying
+        ) ~ 1,
+        incline_off == pmax(
+          incline_off, incline_standing, incline_sitting, incline_lying
+        ) ~ 0,
         TRUE ~ NA
       ),
 
@@ -90,8 +117,8 @@ apply_tudor_locke_algo <- function(
   x <- x |>
     dplyr::mutate(
       day = format(time_stamp, format = "%Y-%m-%d") |>
-	  factor() |>
-	  as.integer(),
+        factor() |>
+        as.integer(),
       hour = lubridate::hour(time_stamp),
       noon_day = dplyr::case_when(
         hour < 12 ~ (day - 1),
@@ -112,7 +139,7 @@ apply_tudor_locke_algo <- function(
         df <- data.frame(sleep_score = x$is_sleeping)
 
         # Get run lengths (round 1)
-        run_lengths <-rle(df$sleep_score)
+        run_lengths <- rle(df$sleep_score)
 
         # Interpret sleep time run lengths
         run_lengths$values <- ifelse(
@@ -167,8 +194,8 @@ apply_tudor_locke_algo <- function(
           no = "No"
         )
 
-        return(x2)
-
+        # Exit
+        x2
       }
     )
   )
@@ -185,5 +212,5 @@ apply_tudor_locke_algo <- function(
     )
 
   # Determine what to return and exit
-  if("everything" %in% return) return(x) else return(x[return])
+  if ("everything" %in% return) x else x[return]
 }

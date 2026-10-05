@@ -2,7 +2,8 @@
 % Please edit documentation in R/apply-non-wear-algo.R
 \name{apply_non_wear_algo}
 \alias{apply_non_wear_algo}
-\title{Classify an accelerometer axis vector of epochs as wear time or non-wear time based on a set of bout rules.}
+\title{Classify an accelerometer axis vector of epochs as wear time or
+non-wear time based on a set of bout rules.}
 \usage{
 apply_non_wear_algo(
   x,
@@ -16,21 +17,32 @@ apply_non_wear_algo(
 \arguments{
 \item{x}{Required: a data frame of accelerometer data.}
 
-\item{axis1}{Required: a length-one character vector representing the name of the vertical axis (default: "axis1").}
+\item{axis1}{Required: a length-one character vector representing the name
+of the vertical axis (default: "axis1").}
 
-\item{min_bout_length}{Required: a length-one numeric vector representing the minimum number of epochs in a bout (default: 10).}
+\item{min_bout_length}{Required: a length-one numeric vector representing
+the minimum number of epochs in a bout (default: 10).}
 
-\item{target_values}{Required: a numeric vector representing the epoch value(s) that belong to a bout.}
+\item{target_values}{Required: a numeric vector representing the epoch
+value(s) that belong to a bout.}
 
-\item{max_exceptions}{Required: a length-one numeric vector representing the maximum number of epochs permitted within a bout that outside the range of the values in the \code{target_values} argument (default: 2).}
+\item{max_exceptions}{Required: a length-one numeric vector representing
+the maximum number of epochs permitted within a bout that outside the range
+of the values in the \code{target_values} argument (default: 2).}
 
-\item{return}{Required: a character vector representing which vectors to return (default: "everything"). If set to "everything", the data frame in the \code{x} argument will be returned along with all vectors that were derived while applying the bout algorithm.}
+\item{return}{Required: a character vector representing which vectors to
+return (default: "everything"). If set to "everything", the data frame in
+the \code{x} argument will be returned along with all vectors that were derived
+while applying the bout algorithm.}
 }
 \value{
-Returns the data frame in the \code{x} argument along with all vectors that were derived while applying the bout algorithm.
+Returns the data frame in the \code{x} argument along with all vectors
+that were derived while applying the bout algorithm.
 }
 \description{
-This function uses a general algorithm to classify an accelerometer axis vector of epochs as wear time or non-wear time based on a set of bout rules
+This function uses a general algorithm to classify an
+accelerometer axis vector of epochs as wear time or non-wear time based on
+a set of bout rules
 }
 \examples{
 # Initialize agd_worker R6 class

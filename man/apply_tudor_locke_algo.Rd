@@ -2,7 +2,8 @@
 % Please edit documentation in R/apply-tudor-locke-algo.R
 \name{apply_tudor_locke_algo}
 \alias{apply_tudor_locke_algo}
-\title{Classify an accelerometer axis vector of 60-second epochs as sleep time or awake time.}
+\title{Classify an accelerometer axis vector of 60-second epochs as sleep
+time or awake time.}
 \usage{
 apply_tudor_locke_algo(
   x,
@@ -18,25 +19,43 @@ apply_tudor_locke_algo(
 \arguments{
 \item{x}{Required: a data frame of accelerometer data in 60-second epochs.}
 
-\item{time_stamp}{Required (default: \code{"dataTimestamp"}): a length-one character vector representing the name of the time stamp vector.}
+\item{time_stamp}{Required (default: \code{"dataTimestamp"}): a length-one
+character vector representing the name of the time stamp vector.}
 
-\item{axis1}{Required (default: \code{"axis1"}): a length-one character vector representing the name of the vertical axis.}
+\item{axis1}{Required (default: \code{"axis1"}): a length-one character vector
+representing the name of the vertical axis.}
 
-\item{incline_off}{Required (default: \code{"inclineOff"}): a length-one character vector representing the name of the corresponding vector in an ActiGraph \code{.agd} file.}
+\item{incline_off}{Required (default: \code{"inclineOff"}): a length-one
+character vector representing the name of the corresponding vector in an
+ActiGraph \code{.agd} file.}
 
-\item{incline_standing}{Required (default: \code{"inclineStanding"}): a length-one character vector representing the name of the corresponding vector in an ActiGraph \code{.agd} file.}
+\item{incline_standing}{Required (default: \code{"inclineStanding"}): a
+length-one character vector representing the name of the corresponding
+vector in an ActiGraph \code{.agd} file.}
 
-\item{incline_sitting}{Required (default: \code{"inclineSitting"}): a length-one character vector representing the name of the corresponding vector in an ActiGraph \code{.agd} file.}
+\item{incline_sitting}{Required (default: \code{"inclineSitting"}): a length-one
+character vector representing the name of the corresponding vector in an
+ActiGraph \code{.agd} file.}
 
-\item{incline_lying}{Required (default: \code{"inclineLying"}): a length-one character vector representing the name of the corresponding vector in an ActiGraph \code{.agd} file.}
+\item{incline_lying}{Required (default: \code{"inclineLying"}): a length-one
+character vector representing the name of the corresponding vector in an
+ActiGraph \code{.agd} file.}
 
-\item{return}{Required (default: \code{"everything"}): a character vector representing which vectors to return. If set to "everything", the data frame in \code{x} will be returned along with all vectors that were derived while applying the Tudor-Locke algorithm.}
+\item{return}{Required (default: \code{"everything"}): a character vector
+representing which vectors to return. If set to "everything", the data frame
+in \code{x} will be returned along with all vectors that were derived while
+applying the Tudor-Locke algorithm.}
 }
 \value{
-Returns \code{x} along with all vectors that were derived while applying the Tudor-Locke algorithm.
+Returns \code{x} along with all vectors that were derived while applying
+the Tudor-Locke algorithm.
 }
 \description{
-This function uses the Tudor-Locke algorithm (https://pubmed.ncbi.nlm.nih.gov/24383507) to classify an accelerometer axis vector of 60-second epochs as sleep time or awake time. This function was validated indirectly against output from the official SAS version of the Barreira algorithm (www.pbrc.edu/pdf/PBRCSleepEpisodeTimeMacroCode.pdf).
+This function uses the Tudor-Locke algorithm
+(https://pubmed.ncbi.nlm.nih.gov/24383507) to classify an accelerometer
+axis vector of 60-second epochs as sleep time or awake time. This function
+was validated indirectly against output from the official SAS version of the
+Barreira algorithm (www.pbrc.edu/pdf/PBRCSleepEpisodeTimeMacroCode.pdf).
 }
 \examples{
 # Initialize agd_worker R6 class

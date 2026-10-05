@@ -2,7 +2,8 @@
 % Please edit documentation in R/apply-sadeh-algo.R
 \name{apply_sadeh_algo}
 \alias{apply_sadeh_algo}
-\title{Classify an accelerometer axis vector of 60-second epochs as sleep time or awake time.}
+\title{Classify an accelerometer axis vector of 60-second epochs as sleep
+time or awake time.}
 \usage{
 apply_sadeh_algo(
   x,
@@ -14,17 +15,28 @@ apply_sadeh_algo(
 \arguments{
 \item{x}{Required: a data frame of accelerometer data.}
 
-\item{axis1}{Required default (\code{"axis1"}): a length-one character vector representing the name of the vertical axis.}
+\item{axis1}{Required default (\code{"axis1"}): a length-one character vector
+representing the name of the vertical axis.}
 
-\item{censor_counts}{Optional (default: \code{FALSE}): a length-one logical vector representing whether to censor accelerometer counts to a maximum of 300 before applying the Sadeh algorithm.}
+\item{censor_counts}{Optional (default: \code{FALSE}): a length-one logical
+vector representing whether to censor accelerometer counts to a maximum of
+300 before applying the Sadeh algorithm.}
 
-\item{return}{Required (default: \code{"everything"}): a character vector representing which vectors to return. If set to "everything", the data frame in \code{x} will be returned along with all vectors that were derived while applying the Sadeh algorithm.}
+\item{return}{Required (default: \code{"everything"}): a character vector
+representing which vectors to return. If set to "everything", the data frame
+in \code{x} will be returned along with all vectors that were derived while
+applying the Sadeh algorithm.}
 }
 \value{
-Returns \code{x} along with all vectors that were derived while applying the Sadeh algorithm. Note: values in the \code{sadeh_sleep_score} vector that are greater than -4 are interpreted as sleep time (see https://actigraphcorp.my.site.com/support/s/article/Where-can-I-find-documentation-for-the-Sadeh-and-Cole-Kripke-algorithms).
+Returns \code{x} along with all vectors that were derived while applying
+the Sadeh algorithm. Note: values in the \code{sadeh_sleep_score} vector that are
+greater than -4 are interpreted as sleep time
+(see https://actigraphcorp.my.site.com/support/s/article/Where-can-I-find-documentation-for-the-Sadeh-and-Cole-Kripke-algorithms). # nolint: line_length_linter.
 }
 \description{
-This function uses the Sadeh algorithm (https://pubmed.ncbi.nlm.nih.gov/7939118) to classify an accelerometer axis vector of 60-second epochs as sleep time or awake time.
+This function uses the Sadeh algorithm
+(https://pubmed.ncbi.nlm.nih.gov/7939118) to classify an accelerometer axis
+vector of 60-second epochs as sleep time or awake time.
 }
 \examples{
 # Initialize agd_worker R6 class

@@ -9,13 +9,15 @@
 \arguments{
 \item{object}{Required: an \link{agd_worker} object.}
 
-\item{...}{Optional: additional arguments affecting the summary produced. \strong{Note:} currently not used.}
+\item{...}{Optional: additional arguments affecting the summary produced.
+\strong{Note:} currently not used.}
 }
 \value{
 Returns \code{NULL} invisibly.
 }
 \description{
-This method renders summary tibbles for waking and sleeping hours from an \link{agd_worker} object to the console.
+This method renders summary tibbles for waking and sleeping
+hours from an \link{agd_worker} object to the console.
 }
 \examples{
 # Initialize agd_worker R6 class

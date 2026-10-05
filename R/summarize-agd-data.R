@@ -62,21 +62,25 @@ summarize_agd_data <- function(x) {
     dplyr::relocate(noon_day_of_week, .after = noon_day)
 
   # Summarize data from midnight
-  day_level_summary_from_midnight <- output |>
+  day_summary_midnight <- output |>
     dplyr::group_by(midnight_day) |>
     dplyr::reframe(
       participant_id = unique(x$args$id),
       device_serial_number = x$data$settings$deviceserial,
       participant_age = x$args$age,
       day_of_week = unique(midnight_day_of_week),
-      wear_time = sum(! mvt_class %in% c("NW", "SL")) / (60 / unique(output$epoch_length)) / 60,
+      wear_time = sum(! mvt_class %in% c("NW", "SL")) /
+        (60 / unique(output$epoch_length)) / 60,
       steps = sum(steps_normal),
       steps_lfe = sum(steps_lfe),
       mpa = sum(mvt_class == "MPA") / (60 / unique(output$epoch_length)),
       vpa = sum(mvt_class == "VPA") / (60 / unique(output$epoch_length)),
-      mvpa_bouts = sum(is_mvpa_bout == "Yes") / (60 / unique(output$epoch_length)),
-      vpa_bouts = sum(is_vpa_bout == "Yes") / (60 / unique(output$epoch_length)),
-      mpa_bouts = sum(is_mpa_bout == "Yes") / (60 / unique(output$epoch_length)),
+      mvpa_bouts = sum(is_mvpa_bout == "Yes") /
+        (60 / unique(output$epoch_length)),
+      vpa_bouts = sum(is_vpa_bout == "Yes") /
+        (60 / unique(output$epoch_length)),
+      mpa_bouts = sum(is_mpa_bout == "Yes") /
+        (60 / unique(output$epoch_length)),
       mvpa = sum(mpa, vpa),
       lpa = sum(mvt_class == "LPA") / (60 / unique(output$epoch_length)),
       lmvpa = sum(lpa, mvpa),
@@ -140,11 +144,11 @@ summarize_agd_data <- function(x) {
     dplyr::relocate(steps_predicted, .after = steps)
 
   # Aggregate summary data from midnight (valid days only)
-  if(sum(day_level_summary_from_midnight$valid_day) == 0) {
-    participant_level_summary_from_midnight <- dplyr::tibble(
-      participant_id = unique(day_level_summary_from_midnight$participant_id),
-      device_serial_number = unique(day_level_summary_from_midnight$device_serial_number),
-      participant_age = mean(day_level_summary_from_midnight$participant_age),
+  if (sum(day_summary_midnight$valid_day) == 0) {
+    participant_summary_midnight <- dplyr::tibble(
+      participant_id = unique(day_summary_midnight$participant_id),
+      device_serial_number = unique(day_summary_midnight$device_serial_number),
+      participant_age = mean(day_summary_midnight$participant_age),
       wear_time = NA,
       steps = NA,
       steps_predicted = NA,
@@ -161,7 +165,7 @@ summarize_agd_data <- function(x) {
       valid_day = 0
     )
   } else {
-    participant_level_summary_from_midnight <- day_level_summary_from_midnight |>
+    participant_summary_midnight <- day_summary_midnight |>
       dplyr::filter(valid_day == 1) |>
       dplyr::group_by(participant_id) |>
       dplyr::reframe(
@@ -199,10 +203,10 @@ summarize_agd_data <- function(x) {
 
   # Add to x$results$summary_waking_hours
   x$results$summary_waking_hours <- dplyr::bind_rows(
-    day_level_summary_from_midnight |>
+    day_summary_midnight |>
       dplyr::mutate(summary = "Waking hours") |>
       dplyr::relocate(summary),
-    participant_level_summary_from_midnight |>
+    participant_summary_midnight |>
       dplyr::mutate(summary = "Waking hours (average)") |>
       dplyr::relocate(summary)
   )
@@ -215,19 +219,33 @@ summarize_agd_data <- function(x) {
       device_serial_number = x$data$settings$deviceserial,
       participant_age = x$args$age,
       day_of_week = unique(noon_day_of_week),
-      wear_time = sum(is_wearing_during_sleep == "Yes", na.rm = TRUE) / (60 / unique(output$epoch_length)) / 60,
-      nocturnal_sleep_onset = suppressWarnings(min(dataTimestamp[mvt_class == "SL"], na.rm = TRUE)),
-      nocturnal_sleep_offset = suppressWarnings(max(dataTimestamp[mvt_class == "SL"], na.rm = TRUE)),
-      nocturnal_sleep_midpoint = suppressWarnings(stats::median(dataTimestamp[mvt_class == "SL"], na.rm = TRUE)),
-      sleep_period_time = sum(mvt_class == "SL") / (60 / unique(output$epoch_length)) / 60,
+      wear_time = sum(is_wearing_during_sleep == "Yes", na.rm = TRUE) /
+        (60 / unique(output$epoch_length)) / 60,
+      nocturnal_sleep_onset = suppressWarnings(
+        min(dataTimestamp[mvt_class == "SL"], na.rm = TRUE)
+      ),
+      nocturnal_sleep_offset = suppressWarnings(
+        max(dataTimestamp[mvt_class == "SL"], na.rm = TRUE)
+      ),
+      nocturnal_sleep_midpoint = suppressWarnings(
+        stats::median(dataTimestamp[mvt_class == "SL"], na.rm = TRUE)
+      ),
+      sleep_period_time = sum(mvt_class == "SL") /
+        (60 / unique(output$epoch_length)) / 60,
       sleep_episodes = max(sleep_bout, na.rm = TRUE),
       wake_episodes = max(awake_bout, na.rm = TRUE),
-      total_wake_episode_time = sum(awake_bout > 0) / (60 / unique(output$epoch_length)) / 60,
+      total_wake_episode_time = sum(awake_bout > 0) /
+        (60 / unique(output$epoch_length)) / 60,
       total_sleep_episode_time = sleep_period_time - total_wake_episode_time,
       sleep_episode_efficiency = total_sleep_episode_time / sleep_period_time,
-      total_restful_sleep_time = sum(axis1[mvt_class == "SL" & awake_bout == 0] == 0) / (60 / unique(output$epoch_length)) / 60,
-      sleep_episode_movements = sum(axis1[mvt_class == "SL" & awake_bout == 0] > 0) / (60 / unique(output$epoch_length)) / 60,
-      total_disrupted_sleep = sum(axis1[mvt_class == "SL"] > 0) / (60 / unique(output$epoch_length)) / 60,
+      total_restful_sleep_time = sum(
+        axis1[mvt_class == "SL" & awake_bout == 0] == 0
+      ) / (60 / unique(output$epoch_length)) / 60,
+      sleep_episode_movements = sum(
+        axis1[mvt_class == "SL" & awake_bout == 0] > 0
+      ) / (60 / unique(output$epoch_length)) / 60,
+      total_disrupted_sleep = sum(axis1[mvt_class == "SL"] > 0) /
+        (60 / unique(output$epoch_length)) / 60,
       restful_sleep_efficiency = total_restful_sleep_time / sleep_period_time
     ) |>
     suppressWarnings() |>
@@ -236,7 +254,8 @@ summarize_agd_data <- function(x) {
     dplyr::relocate(day, .after = participant_age) |>
     dplyr::mutate(
       valid_day = dplyr::case_when(
-        stringr::str_detect(day_of_week, "-") & sleep_period_time >= 160 / 60 ~ 1,
+        stringr::str_detect(day_of_week, "-") &
+          sleep_period_time >= 160 / 60 ~ 1,
         TRUE ~ 0
       ),
       dplyr::across(
@@ -251,10 +270,12 @@ summarize_agd_data <- function(x) {
     dplyr::mutate(valid_day = sum(valid_day))
 
   # Aggregate summary data from noon (valid days only)
-  if(sum(day_level_summary_from_noon$valid_day) == 0) {
-    participant_level_summary_from_noon <- dplyr::tibble(
+  if (sum(day_level_summary_from_noon$valid_day) == 0) {
+    participant_summary_noon <- dplyr::tibble(
       participant_id = unique(day_level_summary_from_noon$participant_id),
-      device_serial_number = unique(day_level_summary_from_noon$device_serial_number),
+      device_serial_number = unique(
+        day_level_summary_from_noon$device_serial_number
+      ),
       participant_age = mean(day_level_summary_from_noon$participant_age),
       wear_time = NA,
       nocturnal_sleep_onset = NA,
@@ -273,7 +294,7 @@ summarize_agd_data <- function(x) {
       valid_day = 0
     )
   } else {
-    participant_level_summary_from_noon <- day_level_summary_from_noon |>
+    participant_summary_noon <- day_level_summary_from_noon |>
       dplyr::filter(valid_day == 1) |>
       dplyr::group_by(participant_id) |>
       dplyr::reframe(
@@ -294,7 +315,12 @@ summarize_agd_data <- function(x) {
               )
             ) |>
             dplyr::reframe(mean = mean(value)) |>
-            dplyr::mutate(mean = as.POSIXct(x = paste("1970-01-01", hms::as_hms(mean %% 86400)), tz = "UTC")) |>
+            dplyr::mutate(
+              mean = as.POSIXct(
+                x = paste("1970-01-01", hms::as_hms(mean %% 86400)),
+                tz = "UTC"
+              )
+            ) |>
             dplyr::pull()
         ),
         dplyr::across(
@@ -310,7 +336,7 @@ summarize_agd_data <- function(x) {
     day_level_summary_from_noon |>
       dplyr::mutate(summary = "Sleeping hours") |>
       dplyr::relocate(summary),
-    participant_level_summary_from_noon |>
+    participant_summary_noon |>
       dplyr::mutate(summary = "Sleeping hours (average)") |>
       dplyr::relocate(summary)
   ) |>
@@ -333,7 +359,8 @@ summarize_agd_data <- function(x) {
       ) |>
         dplyr::mutate(
           day_of_week = dplyr::case_when(
-            weekdays(start_time) == weekdays(stop_time) ~ substr(x = tolower(weekdays(start_time)), start = 1, stop = 3),
+            weekdays(start_time) == weekdays(stop_time) ~
+              substr(x = tolower(weekdays(start_time)), start = 1, stop = 3),
             TRUE ~ paste0(
               substr(x = tolower(weekdays(start_time)), start = 1, stop = 3),
               "-",
@@ -558,7 +585,8 @@ summarize_agd_data <- function(x) {
   # Get max day
   max_day <- max(x$results$summary_full$day, na.rm = TRUE)
 
-  # Reshape x$results$summary_full for StatCan and bind to x$results$summary_full_stc
+  # Reshape x$results$summary_full for StatCan and
+  # bind to x$results$summary_full_stc
   x$results$summary_full_stc <- dplyr::left_join(
     x = x$results$summary_full |>
       dplyr::filter(stringr::str_detect(summary, "Sleeping hours")) |>
@@ -571,10 +599,19 @@ summarize_agd_data <- function(x) {
           )
         )
       ) |>
-      dplyr::select(variable_lookup$name[variable_lookup$level == "Sleeping hours"]) |>
-      dplyr::rename_with(~ variable_lookup$sspe_name[variable_lookup$level == "Sleeping hours"]) |>
+      dplyr::select(
+        variable_lookup$name[variable_lookup$level == "Sleeping hours"]
+      ) |>
+      dplyr::rename_with(
+        ~ variable_lookup$sspe_name[variable_lookup$level == "Sleeping hours"]
+      ) |>
       dplyr::mutate(
-        day = !! rlang::sym(variable_lookup$sspe_name[variable_lookup$level == "Sleeping hours" & variable_lookup$name == "day"]),
+        day = !! rlang::sym(
+          variable_lookup$sspe_name[
+            variable_lookup$level == "Sleeping hours" &
+              variable_lookup$name == "day"
+          ]
+        ),
         dplyr::across(
           .cols = dplyr::everything(),
           .fns = ~ as.character(.x)
@@ -588,10 +625,19 @@ summarize_agd_data <- function(x) {
       dplyr::filter(day != "0"),
     y = x$results$summary_full |>
       dplyr::filter(stringr::str_detect(summary, "Waking hours")) |>
-      dplyr::select(variable_lookup$name[variable_lookup$level == "Waking hours"]) |>
-      dplyr::rename_with(~ variable_lookup$sspe_name[variable_lookup$level == "Waking hours"]) |>
+      dplyr::select(
+        variable_lookup$name[variable_lookup$level == "Waking hours"]
+      ) |>
+      dplyr::rename_with(
+        ~ variable_lookup$sspe_name[variable_lookup$level == "Waking hours"]
+      ) |>
       dplyr::mutate(
-        day = !! rlang::sym(variable_lookup$sspe_name[variable_lookup$level == "Waking hours" & variable_lookup$name == "day"]),
+        day = !! rlang::sym(
+          variable_lookup$sspe_name[
+            variable_lookup$level == "Waking hours" &
+              variable_lookup$name == "day"
+          ]
+        ),
         dplyr::across(
           .cols = dplyr::everything(),
           .fns = ~ as.character(.x)
@@ -658,8 +704,12 @@ summarize_agd_data <- function(x) {
       amgdvls = amgdvls_avg,
       amgdval = amgdval_avg
     ) |>
-    dplyr::relocate(amgdvls, .after = dplyr::contains(paste0("amgdvls", max_day))) |>
-    dplyr::relocate(amgdval, .after = dplyr::contains(paste0("amgdval", max_day))) |>
+    dplyr::relocate(
+      amgdvls, .after = dplyr::contains(paste0("amgdvls", max_day))
+    ) |>
+    dplyr::relocate(
+      amgdval, .after = dplyr::contains(paste0("amgdval", max_day))
+    ) |>
     dplyr::mutate(
       dplyr::across(
         .cols = dplyr::everything(),
@@ -689,19 +739,23 @@ summarize_agd_data <- function(x) {
             unlist()
 
           # Format vectors
-          if(length(vector_meta)) {
-            if(vector_meta["class"] == "integer") {
+          if (length(vector_meta)) {
+            if (vector_meta["class"] == "integer") {
               as.integer(.x)
-            } else if(vector_meta["class"] == "numeric") {
+            } else if (vector_meta["class"] == "numeric") {
               as.numeric(.x) |>
                 round(digits = as.integer(vector_meta["digits"]))
-            } else if(vector_meta["class"] == "date") {
+            } else if (vector_meta["class"] == "date") {
               format(
                 x = lubridate::ymd_hms(.x),
                 format = "%Y-%m-%d %H:%M"
               )
-            } else { .x }
-          } else { .x }
+            } else {
+              .x
+            }
+          } else {
+            .x
+          }
         }
       ),
       amgdpwa = dplyr::case_when(
@@ -721,14 +775,16 @@ summarize_agd_data <- function(x) {
       ),
       amgdsda = dplyr::case_when(
         x$args$age %in% 18:80 & amgdvls >= 3 & amgdslp >= 7 & amgdslp < 10 ~ 1,
-        x$args$age %in% 18:80 & amgdvls >= 3 & (amgdslp < 7 | amgdslp >= 10) ~ 2,
+        x$args$age %in% 18:80 & amgdvls >= 3 &
+          (amgdslp < 7 | amgdslp >= 10) ~ 2,
         TRUE ~ NA
       ),
       amgdsdk = dplyr::case_when(
         x$args$age %in% 5:13 & amgdvls >= 3 & amgdslp >= 9 & amgdslp < 12 ~ 1,
         x$args$age %in% 5:13 & amgdvls >= 3 & (amgdslp < 9 | amgdslp >= 12) ~ 2,
         x$args$age %in% 14:17 & amgdvls >= 3 & amgdslp >= 8 & amgdslp < 11 ~ 1,
-        x$args$age %in% 14:17 & amgdvls >= 3 & (amgdslp < 8 | amgdslp >= 11) ~ 2,
+        x$args$age %in% 14:17 & amgdvls >= 3 &
+          (amgdslp < 8 | amgdslp >= 11) ~ 2,
         TRUE ~ NA
       ),
       amgdsdp = dplyr::case_when(
@@ -761,9 +817,11 @@ summarize_agd_data <- function(x) {
   get_next_day <- function(day) {
     days <- weekdays(as.Date("2025-01-01") + 1:7)
     match <- match(day, days)
-    if(! is.na(match)) {
+    if (! is.na(match)) {
       days[(match %% length(days)) + 1]
-    } else { NA }
+    } else {
+      NA
+    }
   }
 
   # Ensure AMGDDOW variables have no missing values
@@ -774,11 +832,13 @@ summarize_agd_data <- function(x) {
     dplyr::mutate(
       value = purrr::accumulate(
         .x = value,
-        .f = ~ ifelse(
-          test = is.na(.y),
-          yes = get_next_day(.x),
-          no = .y
-        )
+        .f = \(prev, current) {
+          ifelse(
+            test = is.na(current),
+            yes = get_next_day(prev),
+            no = current
+          )
+        }
       )
     ) |>
     dplyr::ungroup() |>
@@ -871,5 +931,5 @@ summarize_agd_data <- function(x) {
     )
 
   # Exit
-  return(invisible(NULL))
+  invisible(NULL)
 }
