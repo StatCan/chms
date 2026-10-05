@@ -1,15 +1,37 @@
-#' @title Classify an accelerometer axis vector of 60-second epochs as sleep time or awake time.
-#' @description This function uses the Barreira algorithm (pubmed.ncbi.nlm.nih.gov/25202840) to classify an accelerometer axis vector of 60-second epochs as sleep time or awake time. This function was validated against output from the official SAS version of the algorithm (www.pbrc.edu/pdf/PBRCSleepEpisodeTimeMacroCode.pdf).
+#' @title Classify an accelerometer axis vector of 60-second epochs as sleep
+#' time or awake time.
+#' @description This function uses the Barreira algorithm
+#' (pubmed.ncbi.nlm.nih.gov/25202840) to classify an accelerometer axis vector
+#' of 60-second epochs as sleep time or awake time. This function was validated
+#' against output from the official SAS version of the algorithm
+#' (www.pbrc.edu/pdf/PBRCSleepEpisodeTimeMacroCode.pdf).
 #' @param x Required: a data frame of accelerometer data in 60-second epochs.
-#' @param time_stamp Required (default "`dateTimestamp`"): a length-one character vector representing the name of the timestamp vector.
-#' @param axis1 Required (default: "`axis1`"): a length-one character vector representing the name of the vertical axis.
-#' @param incline_off Required (default: "`inclineOff`"): a length-one character vector representing the name of the corresponding vector in an ActiGraph .agd file.
-#' @param incline_standing Required (default: "`inclineStanding`"): a length-one character vector representing the name of the corresponding vector in an ActiGraph .agd file.
-#' @param incline_sitting Required (default: "`inclineSitting`"): a length-one character vector representing the name of the corresponding vector in an ActiGraph .agd file.
-#' @param incline_lying Required (default: "`inclineLying`"): a length-one character vector representing the name of the corresponding vector in an ActiGraph .agd file.
-#' @param age Required: a length-one integer vector representing the participant's age in years. This parameter is used to determine when the first sleep bout can begin. Statistics Canada sets the time to 18:00 for participants under five years and younger, and 19:00 for all other ages.
-#' @param return Required (default: "`everything`"): a character vector representing which vectors in `x` to return. If set to "`everything`", the data frame in `x` will be returned along with all vectors that were derived while applying the Barreira algorithm.
-#' @return Returns the data frame `x` along with all vectors that were derived while applying the Barreira algorithm.
+#' @param time_stamp Required (default "`dateTimestamp`"): a length-one
+#' character vector representing the name of the timestamp vector.
+#' @param axis1 Required (default: "`axis1`"): a length-one character vector
+#' representing the name of the vertical axis.
+#' @param incline_off Required (default: "`inclineOff`"): a length-one
+#' character vector representing the name of the corresponding vector in an
+#' ActiGraph .agd file.
+#' @param incline_standing Required (default: "`inclineStanding`"): a
+#' length-one character vector representing the name of the corresponding
+#' vector in an ActiGraph .agd file.
+#' @param incline_sitting Required (default: "`inclineSitting`"): a length-one
+#' character vector representing the name of the corresponding vector in an
+#' ActiGraph .agd file.
+#' @param incline_lying Required (default: "`inclineLying`"): a length-one
+#' character vector representing the name of the corresponding vector in an
+#' ActiGraph .agd file.
+#' @param age Required: a length-one integer vector representing the
+#' participant's age in years. This parameter is used to determine when the
+#' first sleep bout can begin. Statistics Canada sets the time to 18:00 for
+#' participants under five years and younger, and 19:00 for all other ages.
+#' @param return Required (default: "`everything`"): a character vector
+#' representing which vectors in `x` to return. If set to "`everything`", the
+#' data frame in `x` will be returned along with all vectors that were derived
+#' while applying the Barreira algorithm.
+#' @return Returns the data frame `x` along with all vectors that were derived
+#' while applying the Barreira algorithm.
 #' @examples
 #' # Initialize agd_worker R6 class
 #' agd_data <- agd_worker$new(
@@ -39,17 +61,18 @@
 #' @export
 
 apply_barreira_algo <- function(
-    x,
-    time_stamp = "dataTimestamp",
-    axis1 = "axis1",
-    incline_off = "inclineOff",
-    incline_standing = "inclineStanding",
-    incline_sitting = "inclineSitting",
-    incline_lying = "inclineLying",
-    age,
-    return = "everything"
+  x,
+  # nolint start: object_name_linter.
+  time_stamp = "dataTimestamp",
+  axis1 = "axis1",
+  incline_off = "inclineOff",
+  incline_standing = "inclineStanding",
+  incline_sitting = "inclineSitting",
+  incline_lying = "inclineLying",
+  # nolint end
+  age,
+  return = "everything"
 ) {
-
   # Rename vectors
   x <- x |>
     dplyr::rename(
@@ -69,10 +92,18 @@ apply_barreira_algo <- function(
     dplyr::mutate(
       # Compute inclinometer classification per Barreira
       inclinometer = dplyr::case_when(
-        incline_lying == pmax(incline_off, incline_standing, incline_sitting, incline_lying) ~ 2,
-        incline_sitting == pmax(incline_off, incline_standing, incline_sitting, incline_lying) ~ 3,
-        incline_standing == pmax(incline_off, incline_standing, incline_sitting, incline_lying) ~ 1,
-        incline_off == pmax(incline_off, incline_standing, incline_sitting, incline_lying) ~ 0,
+        incline_lying == pmax(
+          incline_off, incline_standing, incline_sitting, incline_lying
+        ) ~ 2,
+        incline_sitting == pmax(
+          incline_off, incline_standing, incline_sitting, incline_lying
+        ) ~ 3,
+        incline_standing == pmax(
+          incline_off, incline_standing, incline_sitting, incline_lying
+        ) ~ 1,
+        incline_off == pmax(
+          incline_off, incline_standing, incline_sitting, incline_lying
+        ) ~ 0,
         TRUE ~ NA
       ),
 
@@ -113,10 +144,12 @@ apply_barreira_algo <- function(
         # Set sleep start time
         sleep_start_time <- 12
 
-        # Filter on hours that are eligible for sleep (e.g., 7pm on day 1 until 11:59am on day 2)
+        # Filter on hours that are eligible for sleep
+        # (e.g., 7pm on day 1 until 11:59am on day 2)
         x3 <- x2 |> dplyr::filter(hour >= sleep_start_time | hour < 12)
 
-        # Compute run lengths and values of equal values and reshape as data frame
+        # Compute run lengths and values of equal values and
+        # reshape as data frame
         df <- x3$is_sleeping |>
           rle() |>
           inverse.rle() |>
@@ -142,19 +175,28 @@ apply_barreira_algo <- function(
           )
 
         # Add hour vector
-        # Important later when evaluating whether a sleep bout has ended (e.g., only 11+ minutes of awake time needed after 5am)
-        #for(i in 1:nrow(df)) df$hour[i] <- max(lubridate::hour(x3$time_stamp[sum(df$length[1:i])]))
-        for(i in 1:nrow(df)) {
-
+        # Important later when evaluating whether a sleep bout has ended
+        # (e.g., only 11+ minutes of awake time needed after 5am)
+        for (i in seq_len(nrow(df))) {
           length_sum_upper_end <- sum(df$length[1:i])
           length_sum_lower_end <- length_sum_upper_end - df$length[i] + 1
-          df$hour[i] <- df$hour_end[i] <- lubridate::hour(max(c(x3$time_stamp[length_sum_lower_end], x3$time_stamp[length_sum_upper_end])))
-          df$hour_start[i] <- lubridate::hour(min(c(x3$time_stamp[length_sum_lower_end], x3$time_stamp[length_sum_upper_end])))
-
+          df$hour[i] <- df$hour_end[i] <- lubridate::hour(
+            max(
+              c(
+                x3$time_stamp[length_sum_lower_end],
+                x3$time_stamp[length_sum_upper_end]
+              )
+            )
+          )
+          df$hour_start[i] <- lubridate::hour(
+            min(
+              c(
+                x3$time_stamp[length_sum_lower_end],
+                x3$time_stamp[length_sum_upper_end]
+              )
+            )
+          )
         }
-
-        # Get all row numbers for values of sleep (i.e. "Sleep", "Sleep 5+")
-        sleep_row_numbers <- which(stringr::str_detect(df$value, "Sleep"))
 
         # Get all row numbers for values of sleep that start a sleep bout
         sleep_bout_start_rows <- which(df$value == "Sleep 5+")
@@ -171,7 +213,7 @@ apply_barreira_algo <- function(
           dplyr::arrange(sleep_bout_start_row)
 
         # If no sleep_bout_stop_rows values exist
-        if(nrow(grid_search) < 1 & "Sleep 5+" %in% df$value) {
+        if (nrow(grid_search) < 1 && "Sleep 5+" %in% df$value) {
 
           # Get age-appropriate sleep start time for a given day
           sleep_start_time <- dplyr::if_else(
@@ -181,103 +223,141 @@ apply_barreira_algo <- function(
           )
 
           # Compute bedtime start and stop times
-          bedtime_start <- x3$time_stamp[sum(df$length[1:(min(which(df$value == "Sleep 5+")) - 1)])] + 60
-          bedtime_stop <- x3$time_stamp[sum(df$length[1:max(which(stringr::str_detect(df$value, "Sleep")))])]
+          bedtime_start <- x3$time_stamp[
+            sum(df$length[1:(min(which(df$value == "Sleep 5+")) - 1)])
+          ] + 60
+          bedtime_stop <- x3$time_stamp[
+            sum(df$length[1:max(which(stringr::str_detect(df$value, "Sleep")))])
+          ]
 
           # Look for early bedtime starts
-          early_bedtime_start <- which(lubridate::hour(bedtime_start) >= 12 & lubridate::hour(bedtime_start) < sleep_start_time)
+          early_bedtime_start <- which(
+            lubridate::hour(bedtime_start) >= 12 &
+              lubridate::hour(bedtime_start) < sleep_start_time
+          )
 
-          if(length(early_bedtime_start)) {
-
+          if (length(early_bedtime_start)) {
             # Reset is_sleeping vector
             x2$is_sleeping <- "No"
-
           } else {
-
             # Add is_sleeping vector to x2
             x2 <- x2 |>
               dplyr::mutate(
                 is_sleeping = dplyr::case_when(
-                  time_stamp >= bedtime_start & time_stamp <= bedtime_stop ~ "Yes",
+                  time_stamp >= bedtime_start & time_stamp <= bedtime_stop ~
+                    "Yes",
                   TRUE ~ "No"
                 )
               )
 
-            if(sum(x2$is_sleeping == "Yes") < 160) x2$is_sleeping <- "No"
-
+            if (sum(x2$is_sleeping == "Yes") < 160) x2$is_sleeping <- "No"
           }
-
           # Else, if a grid exists to search
-        } else if(nrow(grid_search) > 0) {
-
+        } else if (nrow(grid_search) > 0) {
           # Set default variables for grid search
           skip_sleep_bout_start_row <- next_sleep_bout_start_row <- 0
           bedtime_start <- bedtime_stop <- c()
 
           # Iterate grid_search
-          for(i in 1:nrow(grid_search)) {
-
+          for (i in seq_len(nrow(grid_search))) {
             # Skip an iteration if applicable
-            if(
-              grid_search$sleep_bout_start_row[i] == skip_sleep_bout_start_row |
-              grid_search$sleep_bout_start_row[i] < next_sleep_bout_start_row
+            if (
+              grid_search$sleep_bout_start_row[i] ==
+                skip_sleep_bout_start_row ||
+                grid_search$sleep_bout_start_row[i] < next_sleep_bout_start_row
             ) next
 
-            # Compute cumulative sleep time between sleep_bout_start_row and sleep_bout_stop_row
-            # Count sleep minutes and awake minutes except for the final run length (which ends the potential sleep bout)
-            cumulative_sleep_time <- sum(df$length[grid_search$sleep_bout_start_row[i]:(grid_search$sleep_bout_stop_row[i] - 1)])
+            # Compute cumulative sleep time between sleep_bout_start_row and
+            # sleep_bout_stop_row
+            # Count sleep minutes and awake minutes except for the final run
+            # length (which ends the potential sleep bout)
+            cumulative_sleep_time <- sum(
+              df$length[
+                grid_search$sleep_bout_start_row[i]:(
+                  grid_search$sleep_bout_stop_row[i] - 1
+                )
+              ]
+            )
 
             # Evaluate conditions
             condition1 <- cumulative_sleep_time < 160 &
-              df$value[grid_search$sleep_bout_stop_row[i]] %in% c("Awake 11+", "Awake 21+")
+              df$value[grid_search$sleep_bout_stop_row[i]] %in% c(
+                "Awake 11+",
+                "Awake 21+"
+              )
 
             condition2 <- cumulative_sleep_time >= 160 &
-              df$hour_end[grid_search$sleep_bout_stop_row[i]] %in% c(0:4, sleep_start_time:23) &
+              df$hour_end[grid_search$sleep_bout_stop_row[i]] %in% c(
+                0:4,
+                sleep_start_time:23
+              ) &
               df$value[grid_search$sleep_bout_stop_row[i]] %in% c("Awake 21+")
 
-            condition3 <- cumulative_sleep_time >= 160 & df$hour_end[grid_search$sleep_bout_stop_row[i]] %in% 5:11 &
-              df$value[grid_search$sleep_bout_stop_row[i]] %in% c("Awake 11+", "Awake 21+")
+            condition3 <- cumulative_sleep_time >= 160 &
+              df$hour_end[grid_search$sleep_bout_stop_row[i]] %in% 5:11 &
+              df$value[grid_search$sleep_bout_stop_row[i]] %in% c(
+                "Awake 11+",
+                "Awake 21+"
+              )
 
-            if(condition1) {
-
+            if (condition1) {
               skip_sleep_bout_start_row <- grid_search$sleep_bout_start_row[i]
-
-            }  else if(condition2 | condition3) {
-
+            }  else if (condition2 || condition3) {
               bedtime_start <- append(
                 x = bedtime_start,
                 values = ifelse(
                   test = grid_search$sleep_bout_start_row[i] == 1,
                   yes = 1,
-                  no = sum(df$length[1:max(1, (grid_search$sleep_bout_start_row[i] - 1))]) + 1
+                  no = sum(
+                    df$length[
+                      1:max(1, (grid_search$sleep_bout_start_row[i] - 1))
+                    ]
+                  ) + 1
                 )
               )
 
               bedtime_stop <- append(
                 x = bedtime_stop,
                 values = ifelse(
-                  test = grid_search$sleep_bout_stop_row[i] == nrow(df) & ! stringr::str_detect(df$value[nrow(df)], "Awake"),
-                  yes = sum(df$length[1:nrow(df)]),
-                  no = sum(df$length[1:max(1, (grid_search$sleep_bout_stop_row[i] - 1))])
+                  test = grid_search$sleep_bout_stop_row[i] == nrow(df) &
+                    ! stringr::str_detect(df$value[nrow(df)], "Awake"),
+                  yes = sum(df$length[seq_len(nrow(df))]),
+                  no = sum(
+                    df$length[
+                      1:max(1, (grid_search$sleep_bout_stop_row[i] - 1))
+                    ]
+                  )
                 )
               )
 
               # Search for any other sleep bout start rows
-              more_sleep_bout_start_rows <- which(df$value == "Sleep 5+")[which(df$value == "Sleep 5+") > grid_search$sleep_bout_stop_row[i]]
+              cand_rows <- which(df$value == "Sleep 5+")
+              more_sleep_bout_start_rows <- cand_rows[
+                cand_rows > grid_search$sleep_bout_stop_row[i]
+              ]
 
               # If more rows exist, skip ahead; otherwise, end grid search
-              if(length(more_sleep_bout_start_rows) >= 1) next_sleep_bout_start_row <- more_sleep_bout_start_rows[1] else break
-
+              if (length(more_sleep_bout_start_rows) >= 1) {
+                next_sleep_bout_start_row <- more_sleep_bout_start_rows[1]
+              } else {
+                break
+              }
             }
-
           }
 
-          if(length(bedtime_start)) bedtime_start <- x3$time_stamp[bedtime_start]
-          if(length(bedtime_stop)) bedtime_stop <- x3$time_stamp[bedtime_stop]
+          if (length(bedtime_start)) {
+            bedtime_start <- x3$time_stamp[bedtime_start]
+          }
+          if (length(bedtime_stop)) {
+            bedtime_stop <- x3$time_stamp[bedtime_stop]
+          }
 
           # If sleep period(s) found
-          if(lubridate::is.POSIXct(bedtime_start) & lubridate::is.POSIXct(bedtime_stop) & length(bedtime_start) == length(bedtime_stop)) {
-
+          if (
+            lubridate::is.POSIXct(bedtime_start) &&
+              lubridate::is.POSIXct(bedtime_stop) &&
+              length(bedtime_start) == length(bedtime_stop)
+          ) {
             # Reset is_sleeping vector
             x2$is_sleeping <- "No"
 
@@ -289,104 +369,107 @@ apply_barreira_algo <- function(
             )
 
             # Look for early bedtime starts
-            early_bedtime_start <- which(lubridate::hour(bedtime_start) >= 12 & lubridate::hour(bedtime_start) < sleep_start_time)
+            early_bedtime_start <- which(
+              lubridate::hour(bedtime_start) >= 12 &
+                lubridate::hour(bedtime_start) < sleep_start_time
+            )
 
             # If early bedtime starts exist, remove those sleep bouts
-            if(length(early_bedtime_start)) {
-
+            if (length(early_bedtime_start)) {
               bedtime_start <- bedtime_start[-c(early_bedtime_start)]
               bedtime_stop <- bedtime_stop[-c(early_bedtime_start)]
-
             }
 
             # Look for late bedtime starts (on or after 6am)
-            late_bedtime_start <- which(lubridate::hour(bedtime_start) >= 6 & lubridate::hour(bedtime_start) <= 11)
+            late_bedtime_start <- which(
+              lubridate::hour(bedtime_start) >= 6 &
+                lubridate::hour(bedtime_start) <= 11
+            )
 
             # If late bedtime starts exist, remove those sleep bouts
-            if(length(late_bedtime_start)) {
+            if (length(late_bedtime_start)) {
               bedtime_start <- bedtime_start[-c(late_bedtime_start)]
               bedtime_stop <- bedtime_stop[-c(late_bedtime_start)]
             }
 
-            if(length(bedtime_start)) {
-
+            if (length(bedtime_start)) {
               # If multiple sleep bouts exist
-              if(length(bedtime_start) >= 2) {
-
+              if (length(bedtime_start) >= 2) {
                 # Iterate sleep bouts
-                for(i in 2:length(bedtime_start)) {
-
+                for (i in 2:length(bedtime_start)) {
                   # Compute time difference between two sleep bouts
-                  time_between_sleep_periods <- bedtime_start[i] - bedtime_stop[i - 1]
+                  time_between_sleep_periods <- bedtime_start[i] -
+                    bedtime_stop[i - 1]
 
-                  # Remove any sleep bouts on/after 6am that are separated from previous bout by 20+ minutes
-                  if(lubridate::hour(bedtime_start[i]) >= 6 & lubridate::hour(bedtime_start[i]) <= 11 & time_between_sleep_periods >= 20 & attributes(time_between_sleep_periods)$units == "mins") {
-
+                  # Remove any sleep bouts on/after 6am that are separated
+                  # from previous bout by 20+ minutes
+                  if (
+                    lubridate::hour(bedtime_start[i]) >= 6 &&
+                      lubridate::hour(bedtime_start[i]) <= 11 &&
+                      time_between_sleep_periods >= 20 &&
+                      attributes(time_between_sleep_periods)$units == "mins"
+                  ) {
                     bedtime_start <- bedtime_start[1:(i - 1)]
                     bedtime_stop <- bedtime_stop[1:(i - 1)]
                     break
-
                   }
-
                 }
-
               }
 
               # Update is_sleeping vector
-              for(i in 1:length(bedtime_start)) {
+              for (i in seq_along(bedtime_start)) {
                 x2 <- x2 |>
                   dplyr::mutate(
                     is_sleeping = dplyr::case_when(
-                      time_stamp >= !! bedtime_start[i] & time_stamp <= !! bedtime_stop[i] ~ "Yes",
+                      time_stamp >= !! bedtime_start[i] &
+                        time_stamp <= !! bedtime_stop[i] ~ "Yes",
                       TRUE ~ is_sleeping
                     )
                   )
               }
 
-              if(sum(x2$is_sleeping == "Yes") < 160) x2$is_sleeping <- "No"
-
+              if (sum(x2$is_sleeping == "Yes") < 160) x2$is_sleeping <- "No"
             } else {
-
               # Reset is_sleeping vector
               x2$is_sleeping <- "No"
-
             }
-
           } else {
-
             # Reset is_sleeping vector
             x2$is_sleeping <- "No"
-
           }
-
         } else {
-
           # Reset is_sleeping vector
           x2$is_sleeping <- "No"
-
         }
 
         # Derive sleep bout variables
         x2 <- x2 |>
           dplyr::mutate(
-            sleep_bout = cumsum(is_sleeping == "Yes" & ! dplyr::lag(is_sleeping == "Yes", default = FALSE)),
+            sleep_bout = cumsum(
+              is_sleeping == "Yes" &
+                ! dplyr::lag(is_sleeping == "Yes", default = FALSE)
+            ),
             sleep_bout = dplyr::case_when(
               sleep_bout > 0 & is_sleeping == "No" ~ 0,
               TRUE ~ sleep_bout
             ),
             between_sleep_bouts = dplyr::case_when(
-              is_sleeping == "No" & cumsum(is_sleeping == "Yes") > 0 & rev(cumsum(rev(is_sleeping == "Yes")) > 0) ~ "Yes",
+              is_sleeping == "No" & cumsum(is_sleeping == "Yes") > 0 &
+                rev(cumsum(rev(is_sleeping == "Yes")) > 0) ~ "Yes",
               TRUE ~ "No"
             ),
-            awake_bout = cumsum(between_sleep_bouts == "Yes" & ! dplyr::lag(between_sleep_bouts == "Yes", default = FALSE)),
+            awake_bout = cumsum(
+              between_sleep_bouts == "Yes" &
+                ! dplyr::lag(between_sleep_bouts == "Yes", default = FALSE)
+            ),
             awake_bout = dplyr::case_when(
               awake_bout > 0 & between_sleep_bouts == "No" ~ 0,
               TRUE ~ awake_bout
             ),
           )
 
-        return(x2)
-
+        # Exit
+        x2
       }
     )
   )
@@ -396,11 +479,11 @@ apply_barreira_algo <- function(
     lapply(
       X = unique(x$day),
       FUN = function(y) {
-
         # Filter on day
         x2 <- x |> dplyr::filter(day == y)
 
-        # Add is_wearing vector ("No" = 20+ consecutive axis1 counts >= 1 outside of the bedtime start/stop window)
+        # Add is_wearing vector ("No" = 20+ consecutive axis1 counts >= 1
+        # outside of the bedtime start/stop window)
         x2 <- x2 |>
           dplyr::mutate(
             is_wearing = x2 |>
@@ -425,14 +508,14 @@ apply_barreira_algo <- function(
               ) |>
               inverse.rle()
           )
-
-        return(x2)
-
+        # Exit
+        x2
       }
     )
   )
 
-  # Classify wear/non-wear time by noon day (12:00pm to 11:59am) during previously classified sleeping hours
+  # Classify wear/non-wear time by noon day (12:00pm to 11:59am) during
+  # previously classified sleeping hours
   x <- dplyr::bind_rows(
     lapply(
       X = unique(x$noon_day),
@@ -442,7 +525,7 @@ apply_barreira_algo <- function(
         x2 <- x |> dplyr::filter(noon_day == y)
 
         # If a sleep period exists
-        if(sum(x2$is_sleeping == "Yes") >= 1) {
+        if (sum(x2$is_sleeping == "Yes") >= 1) {
 
           # Get sleep window (start of bout 1 to end of last bout)
           sleep_window <- x2 |>
@@ -456,8 +539,10 @@ apply_barreira_algo <- function(
           x2 <- x2 |>
             dplyr::mutate(
               is_wearing_during_sleep = dplyr::case_when(
-                time_stamp %in% sleep_window$time_stamp & is_sleeping == "Yes" ~ "Yes",
-                time_stamp %in% sleep_window$time_stamp & is_sleeping == "No" ~ "No",
+                time_stamp %in% sleep_window$time_stamp &
+                  is_sleeping == "Yes" ~ "Yes",
+                time_stamp %in% sleep_window$time_stamp &
+                  is_sleeping == "No" ~ "No",
                 TRUE ~ NA
               )
             )
@@ -470,8 +555,8 @@ apply_barreira_algo <- function(
           df <- c()
 
           # Iterate sleep_window
-          for(i in 1:nrow(sleep_window)) {
-            if(! in_bout) {
+          for (i in seq_len(nrow(sleep_window))) {
+            if (! in_bout) {
               in_bout <- TRUE
               df <- dplyr::bind_rows(
                 df,
@@ -484,14 +569,15 @@ apply_barreira_algo <- function(
               )
             }
 
-            if(in_bout) {
-              if(! sleep_window$axis1[i] %in% target) {
+            if (in_bout) {
+              if (! sleep_window$axis1[i] %in% target) {
                 exceptions <- exceptions + 1
-                if(exceptions > max_exceptions) {
+                if (exceptions > max_exceptions) {
                   in_bout <- FALSE
                   exceptions <- 0
                   df$bout_stop[nrow(df)] <- i
-                  df$bout_stop_time_stamp[nrow(df)] <- sleep_window$time_stamp[i]
+                  df$bout_stop_time_stamp[nrow(df)] <-
+                    sleep_window$time_stamp[i]
                 }
               }
             }
@@ -506,27 +592,33 @@ apply_barreira_algo <- function(
               ),
               bout_stop_time_stamp = as.POSIXct(bout_stop_time_stamp),
               bout_stop_time_stamp = dplyr::case_when(
-                is.na(bout_stop_time_stamp) ~ sleep_window$time_stamp[nrow(sleep_window)],
+                is.na(bout_stop_time_stamp) ~ sleep_window$time_stamp[
+                  nrow(sleep_window)
+                ],
                 TRUE ~ bout_stop_time_stamp
               ),
               length = bout_stop - bout_start
             ) |>
             dplyr::filter(length >= 90)
 
-          # If valid non-wear time bouts exist, set select vectors to "No" for entire sleep window
-          if(nrow(df)) {
+          # If valid non-wear time bouts exist, set select vectors to "No"
+          # for entire sleep window
+          if (nrow(df)) {
             # If non-wear time bouts >= 90% of all sleep time
-            if(sum(df$length) / nrow(sleep_window) >= 0.90) {
+            if (sum(df$length) / nrow(sleep_window) >= 0.90) {
               x2$is_wearing[x2$time_stamp %in% sleep_window$time_stamp] <- "No"
-              x2$is_wearing_during_sleep[x2$time_stamp %in% sleep_window$time_stamp] <- "No"
+              x2$is_wearing_during_sleep[
+                x2$time_stamp %in% sleep_window$time_stamp
+              ] <- "No"
               x2$is_sleeping[x2$time_stamp %in% sleep_window$time_stamp] <- "No"
             } else {
               # Iterate df and update is_wearing_during_sleep
-              for(i in 1:nrow(df)) {
+              for (i in seq_len(nrow(df))) {
                 x2 <- x2 |>
                   dplyr::mutate(
                     is_wearing_during_sleep = dplyr::case_when(
-                      time_stamp >= df$bout_start_time_stamp[i] & time_stamp < df$bout_stop_time_stamp[i] ~ "No",
+                      time_stamp >= df$bout_start_time_stamp[i] &
+                        time_stamp < df$bout_stop_time_stamp[i] ~ "No",
                       TRUE ~ is_wearing_during_sleep
                     )
                   )
@@ -534,10 +626,12 @@ apply_barreira_algo <- function(
             }
           }
 
-        } else { x2$is_wearing_during_sleep <- NA }
+        } else {
+          x2$is_wearing_during_sleep <- NA
+        }
 
-        return(x2)
-
+        # Exit
+        x2
       }
     )
   )
@@ -553,11 +647,14 @@ apply_barreira_algo <- function(
         false = as.POSIXct(NA)
       )
     ) |>
-    dplyr::filter(! is.na(bedtime_stop), hms::as_hms(bedtime_stop) >= hms::as_hms("11:59:00"))
+    dplyr::filter(
+      ! is.na(bedtime_stop),
+      hms::as_hms(bedtime_stop) >= hms::as_hms("11:59:00")
+    )
 
   # If outliers exist, invalidate sleep
-  if(nrow(outliers)) {
-    for(i in 1:nrow(outliers)) {
+  if (nrow(outliers)) {
+    for (i in seq_len(nrow(outliers))) {
       x$is_sleeping[x$noon_day == outliers$noon_day[i]] <- "No"
       x$is_wearing[x$noon_day == outliers$noon_day[i]] <- "No"
       x$is_wearing_during_sleep[x$noon_day == outliers$noon_day[i]] <- NA
@@ -577,7 +674,6 @@ apply_barreira_algo <- function(
       !! incline_lying := incline_lying
     )
 
-  # Determine what to return
-  if(return[1] == "everything") return(x) else return(x[return])
-
+  # Determine what to return and exit
+  if (return[1] == "everything") x else x[return]
 }

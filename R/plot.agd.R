@@ -1,8 +1,12 @@
 #' @title Plot method for the [agd] R6 class.
-#' @description This method renders scatter plots iteratively and interactively using results from an [agd] object.
+#' @description This method renders scatter plots iteratively and interactively
+#' using results from an [agd] object.
 #' @param x Required: an [agd] object.
-#' @param ... Optional: arguments to be passed to methods. **Note:** currently not used.
-#' @param id Optional: a vector representing participant IDs in `x` for which to render scatter plots. If `id` is unset, scatter plots for all participants in `x` will be rendered iteratively.
+#' @param ... Optional: arguments to be passed to methods. **Note:** currently
+#' not used.
+#' @param id Optional: a vector representing participant IDs in `x` for which
+#' to render scatter plots. If `id` is unset, scatter plots for all participants
+#' in `x` will be rendered iteratively.
 #' @return Returns `ggplot2` objects invisibly.
 #' @method plot agd
 #' @examples
@@ -27,15 +31,20 @@
 
 plot.agd <- function(x, ..., id) {
   # Render messages to console
-  cli::cli_h2(paste0(cli::make_ansi_style("#af3c43")("\U1F341"), cli::make_ansi_style("#000000")("{.emph chms::plot(agd)} method")))
+  cli::cli_h2(
+    paste0(
+      cli::make_ansi_style("#af3c43")("\U1F341"),
+      cli::make_ansi_style("#000000")("{.emph chms::plot(agd)} method")
+    )
+  )
 
   # Throw error if suggested packages are not installed but needed
-  if(! rlang::is_installed("ggplot2")) {
+  if (! rlang::is_installed("ggplot2")) {
     cli::cli_abort("Please install the {.pkg ggplot2} package.")
-  } else if(! rlang::is_installed("scales")) {
+  } else if (! rlang::is_installed("scales")) {
     cli::cli_abort("Please install the {.pkg scales} package.")
-  # Throw error if no data available
-  } else if(sum(x$results$summary_run$days_loaded > 0) < 1) {
+    # Throw error if no data available
+  } else if (sum(x$results$summary_run$days_loaded > 0) < 1) {
     cli::cli_abort("There is no data available to plot.")
   }
 
@@ -50,18 +59,20 @@ plot.agd <- function(x, ..., id) {
   )
 
   # If id set, filter jobs
-  if(! missing(id)) jobs <- jobs |> dplyr::filter(id %in% !! id)
+  if (! missing(id)) jobs <- jobs |> dplyr::filter(id %in% !! id)
 
   # Throw error if no jobs
-  if(! nrow(jobs)) {
+  if (! nrow(jobs)) {
     cli::cli_abort("There is no data available to plot.")
   }
 
   # Iterate jobs
-  for(i in 1:nrow(jobs)) {
+  for (i in seq_len(nrow(jobs))) {
     # Render message to console
-    if(i > 1) cli::cli_text("")
-    cli::cli_alert_info("Rendering scatter plot for participant {.var {jobs$id[i]}}")
+    if (i > 1) cli::cli_text("")
+    cli::cli_alert_info(
+      "Rendering scatter plot for participant {.var {jobs$id[i]}}"
+    )
 
     # Initialize agd_worker and run pipeline
     agd_data <- agd_worker$new(
@@ -87,16 +98,21 @@ plot.agd <- function(x, ..., id) {
     cli::cli_alert_success("Done!")
 
     # If not on the last job
-    if(i < nrow(jobs)) {
+    if (i < nrow(jobs)) {
       # Prompt user
       cli::cli_text("")
-      user_response <- readline(prompt = 'Press the [Enter] button to render the next plot or press the [q] button to quit: ')
+      user_response <- readline(
+        prompt = paste(
+          "Press the [Enter] button to render the next plot",
+          "or press the [q] button to quit: "
+        )
+      )
 
       # Break loop if user wants to quit
-      if(tolower(user_response) == "q") break
+      if (tolower(user_response) == "q") break
     }
   }
 
   # Exit
-  return(invisible(plot))
+  invisible(plot)
 }

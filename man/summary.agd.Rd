@@ -9,15 +9,18 @@
 \arguments{
 \item{object}{Required: an \link{agd_worker} object.}
 
-\item{...}{Optional: additional arguments affecting the summary produced. \strong{Note:} currently not used.}
+\item{...}{Optional: additional arguments affecting the summary produced.
+\strong{Note:} currently not used.}
 
-\item{row_max}{Required (default: \code{10}): a length-one integer vector representing the number of rows of summary data to render to the console.}
+\item{row_max}{Required (default: \code{10}): a length-one integer vector
+representing the number of rows of summary data to render to the console.}
 }
 \value{
 Returns \code{NULL} invisibly.
 }
 \description{
-This method renders summary tibbles for waking and sleeping hours from an \link{agd} object to the console.
+This method renders summary tibbles for waking and sleeping
+hours from an \link{agd} object to the console.
 }
 \examples{
 # Create meta data frame (external/non-statcan users)

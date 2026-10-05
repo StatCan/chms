@@ -25,7 +25,6 @@ meta <- tibble(
   epoch_length = c(15, 60)
 )
 
-# Print/examine
 glimpse(meta)
 
 # Initialize agd R6 class
@@ -42,7 +41,6 @@ agd_data <- agd$new(
   cpu_max = 2
 )
 
-# Print/examine
 agd_data
 
 # Run processing pipeline (load, clean, classify and summarize data)

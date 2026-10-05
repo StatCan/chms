@@ -2,18 +2,22 @@
 % Please edit documentation in R/run-agd-job.R
 \name{run_agd_job}
 \alias{run_agd_job}
-\title{Run a job that initiates an ActiGraph data processing pipeline for a single participant.}
+\title{Run a job that initiates an ActiGraph data processing pipeline for a
+single participant.}
 \usage{
 run_agd_job(x)
 }
 \arguments{
-\item{x}{Required: a one-row tibble from an \link{agd} object \code{jobs} data structure.}
+\item{x}{Required: a one-row tibble from an \link{agd} object \code{jobs} data
+structure.}
 }
 \value{
 Returns the \code{results} list from an \link{agd_worker} object.
 }
 \description{
-This function runs a job that processes ActiGraph data for a single participant by calling \code{agd_worker$new()$run()}. This function is used heavily by the \link{agd} R6 class.
+This function runs a job that processes ActiGraph data for a
+single participant by calling \code{agd_worker$new()$run()}. This function is
+used heavily by the \link{agd} R6 class.
 }
 \examples{
 # Create meta data frame (external/non-statcan users)

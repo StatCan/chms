@@ -1,5 +1,7 @@
 #' @title Prepare an ActiGraph `.agd` file for downstream classification.
-#' @description This function prepares an ActiGraph `.agd` file for downstream classification (e.g., remove incomplete days, aggregate data to 60-second epochs).
+#' @description This function prepares an ActiGraph `.agd` file for downstream
+#' classification (e.g., remove incomplete days, aggregate data to 60-second
+#' epochs).
 #' @param x Required: an [agd_worker] object.
 #' @return Returns a `NULL` invisibly.
 #' @examples
@@ -42,7 +44,8 @@ clean_agd_data <- function(x) {
     dplyr::group_by(ymd) |>
     dplyr::reframe(
       status = ifelse(
-        test = dplyr::n() == 24 * 60 * 60 / as.integer(x$data$settings$epochlength),
+        test = dplyr::n() == 24 * 60 * 60 /
+          as.integer(x$data$settings$epochlength),
         yes = "complete",
         no = "incomplete"
       )
@@ -50,23 +53,23 @@ clean_agd_data <- function(x) {
     dplyr::filter(status == "incomplete")
 
   # If any incomplete days found
-  if(nrow(incomplete_days)) {
+  if (nrow(incomplete_days)) {
     # Remove
     x$data$clean <- x$data$clean |>
       dplyr::filter(! ymd %in% incomplete_days$ymd)
   }
 
   # If no data
-  if(! nrow(x$data$clean)) {
+  if (! nrow(x$data$clean)) {
     # Update issues
     x$issues$no_complete_days <- "yes"
 
     # Exit
-    return(invisible(NULL))
+    invisible(NULL)
   }
 
   # If data not already aggregated to 60-second epochs
-  if(! 60 %in% unique(x$data$clean$epoch_length)) {
+  if (! 60 %in% unique(x$data$clean$epoch_length)) {
     # Aggregate and bind to x$data$clean
     x$data$clean <- dplyr::bind_rows(
       x$data$clean,
@@ -104,11 +107,13 @@ clean_agd_data <- function(x) {
         ) |>
         dplyr::ungroup() |>
         dplyr::mutate(epoch_length = 60) |>
-        dplyr::relocate(midnight_day, ymd, ymd_hm, dataTimestamp, .before = axis1) |>
+        dplyr::relocate(
+          midnight_day, ymd, ymd_hm, dataTimestamp, .before = axis1
+        ) |>
         dplyr::relocate(lux, .after = steps_lfe)
     )
   }
 
   # Exit
-  return(invisible(NULL))
+  invisible(NULL)
 }

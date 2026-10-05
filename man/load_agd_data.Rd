@@ -13,21 +13,28 @@ load_agd_data(
 )
 }
 \arguments{
-\item{file}{Required: a length-one character vector representing the full path to an \code{.agd} file.}
+\item{file}{Required: a length-one character vector representing the full
+path to an \code{.agd} file.}
 
-\item{col_select}{Required (default: "\code{everything}"): a character vector representing which vectors to load.}
+\item{col_select}{Required (default: "\code{everything}"): a character vector
+representing which vectors to load.}
 
-\item{day_max}{Required (default: \code{7}): a length-one integer vector representing the maximum number of days of data to load from \code{file}.}
+\item{day_max}{Required (default: \code{7}): a length-one integer vector
+representing the maximum number of days of data to load from \code{file}.}
 
-\item{start_date}{Optional: a length-one date vector (format: yyyy-mm-dd) representing the first day of data to load from \code{file}. If not set, data will be loaded from the first available day until \code{day_max} is reached.}
+\item{start_date}{Optional: a length-one date vector (format: yyyy-mm-dd)
+representing the first day of data to load from \code{file}. If not set, data
+will be loaded from the first available day until \code{day_max} is reached.}
 
-\item{settings}{Optional: a tibble from \code{file} previously returned from \code{\link[=load_agd_settings]{load_agd_settings()}}.}
+\item{settings}{Optional: a tibble from \code{file} previously returned from
+\code{\link[=load_agd_settings]{load_agd_settings()}}.}
 }
 \value{
 Returns a tibble of the \code{data} table.
 }
 \description{
-This function loads the \code{data} table from an ActiGraph \code{.agd} file.
+This function loads the \code{data} table from an ActiGraph \code{.agd}
+file.
 }
 \examples{
 # Initialize agd_worker R6 class

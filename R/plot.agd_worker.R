@@ -1,10 +1,15 @@
 #' @title Plot method for the [agd_worker] R6 class.
-#' @description This method renders a scatter plot using results from an [agd_worker] object.
+#' @description This method renders a scatter plot using results from an
+#' [agd_worker] object.
 #' @param x Required: an [agd_worker] object.
-#' @param ... Optional: arguments to be passed to methods. **Note:** currently not used.
-#' @param title_size Required (default: `11`): a length-one numeric vector representing the title font size.
-#' @param axis_size Required (default: `9`): a length-one numeric vector representing the axis font size .
-#' @param label_size Required (default: `3`): a length-one numeric vector representing the label font size.
+#' @param ... Optional: arguments to be passed to methods. **Note:** currently
+#' not used.
+#' @param title_size Required (default: `11`): a length-one numeric vector
+#' representing the title font size.
+#' @param axis_size Required (default: `9`): a length-one numeric vector
+#' representing the axis font size .
+#' @param label_size Required (default: `3`): a length-one numeric vector
+#' representing the label font size.
 #' @return Returns a `ggplot2` object invisibly.
 #' @method plot agd_worker
 #' @examples
@@ -27,11 +32,17 @@
 #' plot(agd_data)
 #' @export
 
-plot.agd_worker <- function(x, ..., title_size = 11, axis_size = 9, label_size = 3) {
+plot.agd_worker <- function(
+  x,
+  ...,
+  title_size = 11,
+  axis_size = 9,
+  label_size = 3
+) {
   # Throw error if suggested packages are not installed but needed
-  if(! rlang::is_installed("ggplot2")) {
+  if (! rlang::is_installed("ggplot2")) {
     cli::cli_abort("Please install the {.pkg ggplot2} package.")
-  } else if(! rlang::is_installed("scales")) {
+  } else if (! rlang::is_installed("scales")) {
     cli::cli_abort("Please install the {.pkg scales} package.")
   }
 
@@ -61,7 +72,11 @@ plot.agd_worker <- function(x, ..., title_size = 11, axis_size = 9, label_size =
         ymin = ymin,
         ymax = ymax,
       ),
-      fill = rep(x = c("#ffffff", "#dddddd"), each = 1, length.out = nrow(rect_data)),
+      fill = rep(
+        x = c("#ffffff", "#dddddd"),
+        each = 1,
+        length.out = nrow(rect_data)
+      ),
       alpha = 0.35
     ) +
     ggplot2::geom_text(
@@ -113,7 +128,10 @@ plot.agd_worker <- function(x, ..., title_size = 11, axis_size = 9, label_size =
       )
     ) +
     ggplot2::labs(
-      title = paste0("Processed ActiGraph data (LFE filtered) for participant ", x$args$id),
+      title = paste0(
+        "Processed ActiGraph data (LFE filtered) for participant ",
+        x$args$id
+      ),
       x = "",
       y = paste0(
         "Accelerometer counts (per ",
@@ -123,10 +141,16 @@ plot.agd_worker <- function(x, ..., title_size = 11, axis_size = 9, label_size =
     ) +
     ggplot2::theme_minimal() +
     ggplot2::theme(
-      plot.title = ggplot2::element_text(size = title_size, margin = ggplot2::margin(t = 0, r = 0, b = 20, l = 0)),
+      plot.title = ggplot2::element_text(
+        size = title_size,
+        margin = ggplot2::margin(t = 0, r = 0, b = 20, l = 0)
+      ),
       axis.title.x = ggplot2::element_text(size = axis_size),
       axis.text.x = ggplot2::element_text(size = axis_size),
-      axis.title.y = ggplot2::element_text(size = axis_size, margin = ggplot2::margin(t = 0, r = 20, b = 0, l = 0)),
+      axis.title.y = ggplot2::element_text(
+        size = axis_size,
+        margin = ggplot2::margin(t = 0, r = 20, b = 0, l = 0)
+      ),
       axis.text.y = ggplot2::element_text(size = axis_size),
       legend.title = ggplot2::element_blank(),
       legend.position = "bottom",
@@ -138,5 +162,5 @@ plot.agd_worker <- function(x, ..., title_size = 11, axis_size = 9, label_size =
   print(plot)
 
   # Exit
-  return(invisible(plot))
+  invisible(plot)
 }

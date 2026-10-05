@@ -1,6 +1,10 @@
-#' @title Run a job that initiates an ActiGraph data processing pipeline for a single participant.
-#' @description This function runs a job that processes ActiGraph data for a single participant by calling `agd_worker$new()$run()`. This function is used heavily by the [agd] R6 class.
-#' @param x Required: a one-row tibble from an [agd] object `jobs` data structure.
+#' @title Run a job that initiates an ActiGraph data processing pipeline for a
+#' single participant.
+#' @description This function runs a job that processes ActiGraph data for a
+#' single participant by calling `agd_worker$new()$run()`. This function is
+#' used heavily by the [agd] R6 class.
+#' @param x Required: a one-row tibble from an [agd] object `jobs` data
+#' structure.
 #' @return Returns the `results` list from an [agd_worker] object.
 #' @examples
 #' # Create meta data frame (external/non-statcan users)
@@ -57,7 +61,8 @@ run_agd_job <- function(x) {
     dplyr::mutate(
       participant_id = x$id,
       run_time = dplyr::case_when(
-        dplyr::row_number() == dplyr::n() ~ as.numeric(difftime(max(timestamp), min(timestamp))),
+        dplyr::row_number() == dplyr::n() ~
+          as.numeric(difftime(max(timestamp), min(timestamp))),
         TRUE ~ NA
       )
     ) |>
@@ -95,7 +100,8 @@ run_agd_job <- function(x) {
       mpa_cutpoints = obj$args$mpa_cutpoints,
       vpa_cutpoints = obj$args$vpa_cutpoints,
       device_settings = ifelse(
-        test = ! "settings" %in% names(obj$data) | "error" %in% class(obj$data$settings),
+        test = ! "settings" %in% names(obj$data) |
+          "error" %in% class(obj$data$settings),
         yes = jsonlite::toJSON(dplyr::tibble()),
         no = jsonlite::toJSON(obj$data$settings)
       ),
@@ -108,5 +114,5 @@ run_agd_job <- function(x) {
   obj$results <- obj$results[sort(names(obj$results))]
 
   # Exit
-  return(obj$results)
+  obj$results
 }

@@ -1,6 +1,6 @@
 Package: chms
 Title: Accelerometer Processing Methods for Cycle 7 of the CHMS
-Version: 7.1
+Version: 7.1.9000
 Authors@R: c(
     person("Joel", "Barnes", , "joel.barnes@statcan.gc.ca", role = c("aut", "cre")),
     person("Janine", "Clarke", , "janine.clarke@statcan.gc.ca", role = "ctb"),
@@ -21,9 +21,9 @@ URL: https://github.com/statcan/chms
 BugReports: https://github.com/statcan/chms/issues
 Depends: 
     R (>= 4.1.0)
+Config/roxygen2/version: 8.1.0
 Encoding: UTF-8
 Roxygen: list(markdown = TRUE)
-RoxygenNote: 7.3.2
 Imports: 
     cli,
     DBI,
@@ -35,7 +35,6 @@ Imports:
     knitr,
     lubridate,
     mirai,
-    mori,
     parallelly,
     purrr,
     R6,

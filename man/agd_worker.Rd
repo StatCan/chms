@@ -4,7 +4,10 @@
 \alias{agd_worker}
 \title{R6 class: \code{agd_worker}}
 \description{
-\code{agd_worker} is an R6 class that runs a data processing pipeline on two \code{.agd} (ActiGraph; github.com/actigraph) accelerometer files with \code{LowFrequencyExtension} and \code{Normal} filters for a single participant. This class does all the heavy lifting for the \link{agd} R6 class.
+\code{agd_worker} is an R6 class that runs a data processing
+pipeline on two \code{.agd} (ActiGraph; github.com/actigraph) accelerometer files
+with \code{LowFrequencyExtension} and \code{Normal} filters for a single participant.
+This class does all the heavy lifting for the \link{agd} R6 class.
 }
 \examples{
 # Initialize agd_worker R6 class
@@ -23,40 +26,52 @@ agd_data <- agd_worker$new(
 agd_data$run()
 }
 \section{Public fields}{
-\if{html}{\out{<div class="r6-fields">}}
-\describe{
-\item{\code{args}}{A list of arguments passed into \code{agd_worker$new()}. See documentation for \code{agd_worker$new()} for details.}
+  \if{html}{\out{<div class="r6-fields">}}
+  \describe{
+    \item{\code{args}}{A list of arguments passed into \code{agd_worker$new()}. See
+documentation for \code{agd_worker$new()} for details.}
 
-\item{\code{data}}{A list of four tibbles created during \code{agd_worker$load()} (\code{settings}, \code{raw}), \code{agd_worker$clean()} (\code{clean}) and \code{agd_worker$classify()} (\code{classify}) representing \code{.agd} data at various stages of the pipeline.}
+    \item{\code{data}}{A list of four tibbles created during \code{agd_worker$load()}
+(\code{settings}, \code{raw}), \code{agd_worker$clean()} (\code{clean}) and
+\code{agd_worker$classify()} (\code{classify}) representing \code{.agd} data at various
+stages of the pipeline.}
 
-\item{\code{issues}}{A list of seven length-one, dichotomous (\code{"yes"}/\code{""}) character vectors (\code{file_missing}, \code{files_identical}, \code{files_mismatched}, \code{non_midnight_start}, \code{no_complete_days}, \code{sleep_missing}, \code{age_out_of_range}) representing flags for issues affecting pipeline results.}
+    \item{\code{issues}}{A list of seven length-one, dichotomous (\code{"yes"}/\code{""})
+character vectors (\code{file_missing}, \code{files_identical}, \code{files_mismatched},
+\code{non_midnight_start}, \code{no_complete_days}, \code{sleep_missing},
+\code{age_out_of_range}) representing flags for issues affecting pipeline
+results.}
 
-\item{\code{log}}{A tibble with \code{method}, \code{timestamp}, \code{status} and \code{message} vectors providing a record of events during the pipeline run.}
+    \item{\code{log}}{A tibble with \code{method}, \code{timestamp}, \code{status} and \code{message}
+vectors providing a record of events during the pipeline run.}
 
-\item{\code{results}}{A list of four tibbles (\code{summary_full}, \code{summary_full_stc}, \code{summary_sleeping_hours}, \code{summary_waking_hours}) summarizing the pipeline run.}
-}
-\if{html}{\out{</div>}}
+    \item{\code{results}}{A list of four tibbles (\code{summary_full},
+\code{summary_full_stc}, \code{summary_sleeping_hours}, \code{summary_waking_hours})
+summarizing the pipeline run.}
+  }
+  \if{html}{\out{</div>}}
 }
 \section{Methods}{
 \subsection{Public methods}{
-\itemize{
-\item \href{#method-agd_worker-new}{\code{agd_worker$new()}}
-\item \href{#method-agd_worker-load}{\code{agd_worker$load()}}
-\item \href{#method-agd_worker-clean}{\code{agd_worker$clean()}}
-\item \href{#method-agd_worker-classify}{\code{agd_worker$classify()}}
-\item \href{#method-agd_worker-summarize}{\code{agd_worker$summarize()}}
-\item \href{#method-agd_worker-run}{\code{agd_worker$run()}}
-\item \href{#method-agd_worker-print}{\code{agd_worker$print()}}
-\item \href{#method-agd_worker-clone}{\code{agd_worker$clone()}}
-}
+  \itemize{
+    \item \href{#method-agd_worker-initialize}{\code{agd_worker$new()}}
+    \item \href{#method-agd_worker-load}{\code{agd_worker$load()}}
+    \item \href{#method-agd_worker-clean}{\code{agd_worker$clean()}}
+    \item \href{#method-agd_worker-classify}{\code{agd_worker$classify()}}
+    \item \href{#method-agd_worker-summarize}{\code{agd_worker$summarize()}}
+    \item \href{#method-agd_worker-run}{\code{agd_worker$run()}}
+    \item \href{#method-agd_worker-print}{\code{agd_worker$print()}}
+    \item \href{#method-agd_worker-clone}{\code{agd_worker$clone()}}
+  }
 }
 \if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-agd_worker-new"></a>}}
-\if{latex}{\out{\hypertarget{method-agd_worker-new}{}}}
-\subsection{Method \code{new()}}{
-This method creates an instance of an \code{agd_worker} class.
-\subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{agd_worker$new(
+\if{html}{\out{<a id="method-agd_worker-initialize"></a>}}
+\if{latex}{\out{\hypertarget{method-agd_worker-initialize}{}}}
+\subsection{\code{agd_worker$new()}}{
+  This method creates an instance of an \code{agd_worker} class.
+  \subsection{Usage}{
+    \if{html}{\out{<div class="r">}}
+    \preformatted{agd_worker$new(
   id,
   age,
   agd_lfe,
@@ -66,129 +81,162 @@ This method creates an instance of an \code{agd_worker} class.
   sleep_algo = "barreira",
   non_wear_algo = "barreira",
   start_date = NA
-)}\if{html}{\out{</div>}}
+)}
+    \if{html}{\out{</div>}}
+  }
+  \subsection{Arguments}{
+    \if{html}{\out{<div class="arguments">}}
+    \describe{
+      \item{\code{id}}{Required: a length-one vector representing a unique
+participant ID.}
+      \item{\code{age}}{Required: a length-one integer vector representing a
+participant's age in years.}
+      \item{\code{agd_lfe}}{Required: a length-one character vector representing the
+full path to an \code{.agd} file with the \code{LowFrequencyExtension} filter.}
+      \item{\code{agd_nml}}{Required: a length-one character vector representing the
+full path to an \code{.agd} file with the \code{Normal} filter.}
+      \item{\code{epoch_length}}{Required (default: \code{60}): a length-one integer
+vector representing the epoch length at which to process the data.
+Statistics Canada currently uses \code{15} for participants under 18 years
+and \code{60} for participants at all other ages. Note: if \code{sleep_algo} is
+set to \code{"barreira"} and \code{epoch_length} is set to \code{15}, the sleep
+algorithm will be applied to 60-second epoch data and the results will
+be applied to the 15-second epoch data.}
+      \item{\code{day_max}}{Required (default: \code{7}): a length-one integer vector
+representing the maximum number of days of data to load from \code{agd_lfe}
+and \code{agd_nml}.}
+      \item{\code{sleep_algo}}{Required (default: \code{"barreira"}): a length-one
+character vector representing the sleep algorithm to apply. Options
+currently include \code{"barreira"}. See \code{\link[=apply_barreira_algo]{apply_barreira_algo()}} for more
+details.}
+      \item{\code{non_wear_algo}}{Required (default: \code{"barreira"}): a length-one
+character vector representing the non-wear algorithm to apply. Options
+currently include \code{"barreira"}, \code{"20-min-algo"}, \code{"60-min-algo"},
+\code{"90-min-algo"} and \code{"choi"}. See \code{\link[=apply_barreira_algo]{apply_barreira_algo()}} and
+\code{\link[=apply_non_wear_algo]{apply_non_wear_algo()}} for more details.}
+      \item{\code{start_date}}{Optional (default: \code{NA}): a length-one date vector
+(format: yyyy-mm-dd) representing the first day of data to load from
+\code{agd_lfe} and \code{agd_nml}. If not set, data will be loaded from the first
+available day until \code{day_max} is reached.}
+    }
+    \if{html}{\out{</div>}}
+  }
+  \subsection{Returns}{
+    Returns an object of class \code{agd_worker}.
+  }
 }
 
-\subsection{Arguments}{
-\if{html}{\out{<div class="arguments">}}
-\describe{
-\item{\code{id}}{Required: a length-one vector representing a unique participant ID.}
-
-\item{\code{age}}{Required: a length-one integer vector representing a participant's age in years.}
-
-\item{\code{agd_lfe}}{Required: a length-one character vector representing the full path to an \code{.agd} file with the \code{LowFrequencyExtension} filter.}
-
-\item{\code{agd_nml}}{Required: a length-one character vector representing the full path to an \code{.agd} file with the \code{Normal} filter.}
-
-\item{\code{epoch_length}}{Required (default: \code{60}): a length-one integer vector representing the epoch length at which to process the data. Statistics Canada currently uses \code{15} for participants under 18 years and \code{60} for participants at all other ages. Note: if \code{sleep_algo} is set to \code{"barreira"} and \code{epoch_length} is set to \code{15}, the sleep algorithm will be applied to 60-second epoch data and the results will be applied to the 15-second epoch data.}
-
-\item{\code{day_max}}{Required (default: \code{7}): a length-one integer vector representing the maximum number of days of data to load from \code{agd_lfe} and \code{agd_nml}.}
-
-\item{\code{sleep_algo}}{Required (default: \code{"barreira"}): a length-one character vector representing the sleep algorithm to apply. Options currently include \code{"barreira"}. See \code{\link[=apply_barreira_algo]{apply_barreira_algo()}} for more details.}
-
-\item{\code{non_wear_algo}}{Required (default: \code{"barreira"}): a length-one character vector representing the non-wear algorithm to apply. Options currently include \code{"barreira"}, \code{"20-min-algo"}, \code{"60-min-algo"}, \code{"90-min-algo"} and \code{"choi"}. See \code{\link[=apply_barreira_algo]{apply_barreira_algo()}} and \code{\link[=apply_non_wear_algo]{apply_non_wear_algo()}} for more details.}
-
-\item{\code{start_date}}{Optional (default: \code{NA}): a length-one date vector (format: yyyy-mm-dd) representing the first day of data to load from \code{agd_lfe} and \code{agd_nml}. If not set, data will be loaded from the first available day until \code{day_max} is reached.}
-}
-\if{html}{\out{</div>}}
-}
-\subsection{Returns}{
-Returns an object of class \code{agd_worker}.
-}
-}
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-agd_worker-load"></a>}}
 \if{latex}{\out{\hypertarget{method-agd_worker-load}{}}}
-\subsection{Method \code{load()}}{
-This method calls \code{\link[=load_agd_settings]{load_agd_settings()}} and \code{\link[=load_agd_data]{load_agd_data()}}.
-\subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{agd_worker$load()}\if{html}{\out{</div>}}
+\subsection{\code{agd_worker$load()}}{
+  This method calls \code{\link[=load_agd_settings]{load_agd_settings()}} and
+\code{\link[=load_agd_data]{load_agd_data()}}.
+  \subsection{Usage}{
+    \if{html}{\out{<div class="r">}}
+    \preformatted{agd_worker$load()}
+    \if{html}{\out{</div>}}
+  }
+  \subsection{Returns}{
+    Returns the \code{agd_worker} object (\code{self}) invisibly.
+  }
 }
 
-\subsection{Returns}{
-Returns the \code{agd_worker} object (\code{self}) invisibly.
-}
-}
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-agd_worker-clean"></a>}}
 \if{latex}{\out{\hypertarget{method-agd_worker-clean}{}}}
-\subsection{Method \code{clean()}}{
-This method calls \code{\link[=clean_agd_data]{clean_agd_data()}}.
-\subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{agd_worker$clean()}\if{html}{\out{</div>}}
+\subsection{\code{agd_worker$clean()}}{
+  This method calls \code{\link[=clean_agd_data]{clean_agd_data()}}.
+  \subsection{Usage}{
+    \if{html}{\out{<div class="r">}}
+    \preformatted{agd_worker$clean()}
+    \if{html}{\out{</div>}}
+  }
+  \subsection{Returns}{
+    Returns the \code{agd_worker} object (\code{self}) invisibly.
+  }
 }
 
-\subsection{Returns}{
-Returns the \code{agd_worker} object (\code{self}) invisibly.
-}
-}
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-agd_worker-classify"></a>}}
 \if{latex}{\out{\hypertarget{method-agd_worker-classify}{}}}
-\subsection{Method \code{classify()}}{
-This method calls \code{\link[=classify_agd_data]{classify_agd_data()}}.
-\subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{agd_worker$classify()}\if{html}{\out{</div>}}
+\subsection{\code{agd_worker$classify()}}{
+  This method calls \code{\link[=classify_agd_data]{classify_agd_data()}}.
+  \subsection{Usage}{
+    \if{html}{\out{<div class="r">}}
+    \preformatted{agd_worker$classify()}
+    \if{html}{\out{</div>}}
+  }
+  \subsection{Returns}{
+    Returns the \code{agd_worker} object (\code{self}) invisibly.
+  }
 }
 
-\subsection{Returns}{
-Returns the \code{agd_worker} object (\code{self}) invisibly.
-}
-}
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-agd_worker-summarize"></a>}}
 \if{latex}{\out{\hypertarget{method-agd_worker-summarize}{}}}
-\subsection{Method \code{summarize()}}{
-This method calls \code{\link[=summarize_agd_data]{summarize_agd_data()}}.
-\subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{agd_worker$summarize()}\if{html}{\out{</div>}}
+\subsection{\code{agd_worker$summarize()}}{
+  This method calls \code{\link[=summarize_agd_data]{summarize_agd_data()}}.
+  \subsection{Usage}{
+    \if{html}{\out{<div class="r">}}
+    \preformatted{agd_worker$summarize()}
+    \if{html}{\out{</div>}}
+  }
+  \subsection{Returns}{
+    Returns the \code{agd_worker} object (\code{self}) invisibly.
+  }
 }
 
-\subsection{Returns}{
-Returns the \code{agd_worker} object (\code{self}) invisibly.
-}
-}
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-agd_worker-run"></a>}}
 \if{latex}{\out{\hypertarget{method-agd_worker-run}{}}}
-\subsection{Method \code{run()}}{
-This method calls \code{agd_worker$load()}, \code{agd_worker$clean()}, \code{agd_worker$classify()} and \code{agd_worker$summarize()}.
-\subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{agd_worker$run()}\if{html}{\out{</div>}}
+\subsection{\code{agd_worker$run()}}{
+  This method calls \code{agd_worker$load()},
+\code{agd_worker$clean()}, \code{agd_worker$classify()} and
+\code{agd_worker$summarize()}.
+  \subsection{Usage}{
+    \if{html}{\out{<div class="r">}}
+    \preformatted{agd_worker$run()}
+    \if{html}{\out{</div>}}
+  }
+  \subsection{Returns}{
+    Returns the \code{agd_worker} object (\code{self}) invisibly.
+  }
 }
 
-\subsection{Returns}{
-Returns the \code{agd_worker} object (\code{self}) invisibly.
-}
-}
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-agd_worker-print"></a>}}
 \if{latex}{\out{\hypertarget{method-agd_worker-print}{}}}
-\subsection{Method \code{print()}}{
-This method renders details (arguments, issues, log) about an instance of \code{agd_worker} to the console.
-\subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{agd_worker$print()}\if{html}{\out{</div>}}
+\subsection{\code{agd_worker$print()}}{
+  This method renders details (arguments, issues, log) about
+an instance of \code{agd_worker} to the console.
+  \subsection{Usage}{
+    \if{html}{\out{<div class="r">}}
+    \preformatted{agd_worker$print()}
+    \if{html}{\out{</div>}}
+  }
+  \subsection{Returns}{
+    Returns the \code{agd_worker} object (\code{self}) invisibly.
+  }
 }
 
-\subsection{Returns}{
-Returns the \code{agd_worker} object (\code{self}) invisibly.
-}
-}
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-agd_worker-clone"></a>}}
 \if{latex}{\out{\hypertarget{method-agd_worker-clone}{}}}
-\subsection{Method \code{clone()}}{
-The objects of this class are cloneable with this method.
-\subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{agd_worker$clone(deep = FALSE)}\if{html}{\out{</div>}}
+\subsection{\code{agd_worker$clone()}}{
+  The objects of this class are cloneable with this method.
+  \subsection{Usage}{
+    \if{html}{\out{<div class="r">}}
+    \preformatted{agd_worker$clone(deep = FALSE)}
+    \if{html}{\out{</div>}}
+  }
+  \subsection{Arguments}{
+    \if{html}{\out{<div class="arguments">}}
+    \describe{
+      \item{\code{deep}}{Whether to make a deep clone.}
+    }
+    \if{html}{\out{</div>}}
+  }
 }
 
-\subsection{Arguments}{
-\if{html}{\out{<div class="arguments">}}
-\describe{
-\item{\code{deep}}{Whether to make a deep clone.}
-}
-\if{html}{\out{</div>}}
-}
-}
 }

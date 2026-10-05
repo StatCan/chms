@@ -27,14 +27,25 @@
 
 classify_agd_data <- function(x) {
   # Apply sleep algorithm
-  if(tolower(x$args$sleep_algo) == "barreira") {
+  if (tolower(x$args$sleep_algo) == "barreira") {
     # Update parameters
     x$args$sleep_epoch_length <- 60
 
     # Apply Barreira sleep time algorithm
     sleep_output <- x$data$clean |>
       dplyr::filter(epoch_length == 60, filter == "LowFrequencyExtension") |>
-      apply_barreira_algo(age = x$args$age, return = c("is_sleeping", "is_wearing", "is_wearing_during_sleep", "ymd_hm", "noon_day", "sleep_bout", "awake_bout"))
+      apply_barreira_algo(
+        age = x$args$age,
+        return = c(
+          "is_sleeping",
+          "is_wearing",
+          "is_wearing_during_sleep",
+          "ymd_hm",
+          "noon_day",
+          "sleep_bout",
+          "awake_bout"
+        )
+      )
   }
 
   # Create x$data$classify and add sleep variables
@@ -54,7 +65,7 @@ classify_agd_data <- function(x) {
   )
 
   # Apply non-wear algorithm
-  if(tolower(x$args$non_wear_algo) == "barreira") {
+  if (tolower(x$args$non_wear_algo) == "barreira") {
     x$data$classify <- x$data$classify |>
       dplyr::select(-dplyr::any_of("is_wearing")) |>
       dplyr::left_join(
@@ -62,14 +73,22 @@ classify_agd_data <- function(x) {
           dplyr::select(ymd_hm, is_wearing),
         by = "ymd_hm"
       )
-  } else if(tolower(x$args$non_wear_algo) %in% paste0(c(20, 60, 90), "-minute")) {
+  } else if (
+    tolower(x$args$non_wear_algo) %in% paste0(c(20, 60, 90), "-minute")
+  ) {
     x$data$classify <- x$data$classify |>
       dplyr::select(-dplyr::any_of("is_wearing")) |>
       dplyr::left_join(
         y = x$data$classify |>
-          dplyr::filter(epoch_length == x$args$non_wear_epoch_length, filter == "LowFrequencyExtension") |>
+          dplyr::filter(
+            epoch_length == x$args$non_wear_epoch_length,
+            filter == "LowFrequencyExtension"
+          ) |>
           apply_non_wear_algo(
-            min_bout_length = strsplit(x = x$args$non_wear_algo, split = "-")[[1]][1] |> as.integer() * (60 / x$args$non_wear_epoch_length),
+            min_bout_length = strsplit(
+              x = x$args$non_wear_algo,
+              split = "-"
+            )[[1]][1] |> as.integer() * (60 / x$args$non_wear_epoch_length),
             target_values = 0,
             max_exceptions = 2 * ((60 / x$args$non_wear_epoch_length)),
             return = c("is_wearing", "is_sleeping", "ymd_hm")
@@ -77,9 +96,11 @@ classify_agd_data <- function(x) {
           dplyr::select(ymd_hm, is_wearing),
         by = "ymd_hm"
       )
-  } else if(tolower(x$args$non_wear_algo) == "choi") {
-    # Apply Choi (2011) wear time algorithm (https://pubmed.ncbi.nlm.nih.gov/20581716)
-    # Note: this function will not work if df is a tibble; df must be of class "data.frame"
+  } else if (tolower(x$args$non_wear_algo) == "choi") {
+    # Apply Choi (2011) wear time algorithm;
+    # see https://pubmed.ncbi.nlm.nih.gov/20581716
+    # Note: this function will not work if df is a tibble;
+    # df must be of class "data.frame"
     check_name_spaces("PhysicalActivity")
 
     x$data$classify <- x$data$classify |>
@@ -90,7 +111,10 @@ classify_agd_data <- function(x) {
           dplyr::left_join(
             y = PhysicalActivity::wearingMarking(
               dataset = x$data$classify |>
-                dplyr::filter(epoch_length == x$args$non_wear_epoch_length, filter == "LowFrequencyExtension"),
+                dplyr::filter(
+                  epoch_length == x$args$non_wear_epoch_length,
+                  filter == "LowFrequencyExtension"
+                ),
               perMinuteCts = 60 / x$args$non_wear_epoch_length,
               TS = "dataTimestamp",
               cts = "axis1"
@@ -110,22 +134,22 @@ classify_agd_data <- function(x) {
   }
 
   # Get appropriate cut-points movement intensity classification
-  if(x$args$age >= 65) {
+  if (x$args$age >= 65) {
     sb_cutpoint <- 0 / (60 / x$args$movement_epoch_length)
     lpa_cutpoint <- 100 / (60 / x$args$movement_epoch_length)
     mpa_cutpoint <- 2020 / (60 / x$args$movement_epoch_length)
     vpa_cutpoint <- 5999 / (60 / x$args$movement_epoch_length)
-  } else if(x$args$age >= 18) {
+  } else if (x$args$age >= 18) {
     sb_cutpoint <- 0 / (60 / x$args$movement_epoch_length)
     lpa_cutpoint <- 100 / (60 / x$args$movement_epoch_length)
     mpa_cutpoint <- 2020 / (60 / x$args$movement_epoch_length)
     vpa_cutpoint <- 5999 / (60 / x$args$movement_epoch_length)
-  } else if(x$args$age >= 5) {
+  } else if (x$args$age >= 5) {
     sb_cutpoint <- 0 / (60 / x$args$movement_epoch_length)
     lpa_cutpoint <- 100 / (60 / x$args$movement_epoch_length)
     mpa_cutpoint <- 2296 / (60 / x$args$movement_epoch_length)
     vpa_cutpoint <- 4012 / (60 / x$args$movement_epoch_length)
-  } else if(x$args$age >= 3) {
+  } else if (x$args$age >= 3) {
     sb_cutpoint <- 0 / (60 / x$args$movement_epoch_length)
     lpa_cutpoint <- 100 / (60 / x$args$movement_epoch_length)
     mpa_cutpoint <- vpa_cutpoint <- 1680 / (60 / x$args$movement_epoch_length)
@@ -139,10 +163,40 @@ classify_agd_data <- function(x) {
     )
 
   # Update parameters
-  x$args$sb_cutpoints <- paste0(sb_cutpoint, "-", lpa_cutpoint - 1, " counts per ", x$args$movement_epoch_length, "s", collapse = "")
-  x$args$lpa_cutpoints <- paste0(lpa_cutpoint, "-", mpa_cutpoint - 1, " counts per ", x$args$movement_epoch_length, "s", collapse = "")
-  x$args$mpa_cutpoints <- paste0(mpa_cutpoint, "-", vpa_cutpoint - 1, " counts per ", x$args$movement_epoch_length, "s", collapse = "")
-  x$args$vpa_cutpoints <- paste0(vpa_cutpoint, "+ counts per ", x$args$movement_epoch_length, "s", collapse = "")
+  x$args$sb_cutpoints <- paste0(
+    sb_cutpoint,
+    "-",
+    lpa_cutpoint - 1,
+    " counts per ",
+    x$args$movement_epoch_length,
+    "s",
+    collapse = ""
+  )
+  x$args$lpa_cutpoints <- paste0(
+    lpa_cutpoint,
+    "-",
+    mpa_cutpoint - 1,
+    " counts per ",
+    x$args$movement_epoch_length,
+    "s",
+    collapse = ""
+  )
+  x$args$mpa_cutpoints <- paste0(
+    mpa_cutpoint,
+    "-",
+    vpa_cutpoint - 1,
+    " counts per ",
+    x$args$movement_epoch_length,
+    "s",
+    collapse = ""
+  )
+  x$args$vpa_cutpoints <- paste0(
+    vpa_cutpoint,
+    "+ counts per ",
+    x$args$movement_epoch_length,
+    "s",
+    collapse = ""
+  )
 
   # Classify movement intensity
   x$data$classify <- x$data$classify |>
@@ -203,5 +257,5 @@ classify_agd_data <- function(x) {
     )
 
   # Exit
-  return(invisible(NULL))
+  invisible(NULL)
 }

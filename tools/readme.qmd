@@ -76,7 +76,7 @@ For more details on the methods used in the **chms** R package, see Clarke J, Gr
 
 ```{r, eval = FALSE}
 # Install official release (CRAN)
-install.packages("chms")
+pak::pak("chms")
 
 # Install development version (GitHub)
 pak::pak("statcan/chms")
@@ -291,7 +291,7 @@ R. <a href="https://www150.statcan.gc.ca/n1/pub/82-003-x/2026002/article/00001-f
 
 ```{r, eval = FALSE}
 # Install official release (CRAN)
-install.packages("chms")
+pak::pak("chms")
 
 # Install development version (GitHub)
 pak::pak("statcan/chms")
