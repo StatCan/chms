@@ -228,6 +228,54 @@ agd <- R6::R6Class(
 
       # If no error in results
       if (! inherits(self$results, "error")) {
+        # Reorder vectors in summary_full_statcan_format for Processing
+        self$results$summary_full_stc <- self$results$summary_full_stc |>
+          dplyr::relocate(
+            dplyr::any_of(
+              c(
+                "CLINICID",
+                paste0("AMGDT", 1:7),
+                paste0("AMGDDOW", 1:7),
+                get_stc_vars(
+                  c(
+                    "HR",
+                    "SLP",
+                    "SST",
+                    "MA",
+                    "VA",
+                    "MVB",
+                    "VB",
+                    "MB",
+                    "MVA",
+                    "LA",
+                    "TA",
+                    "SA",
+                    "VAL",
+                    "VLS"
+                  )
+                ),
+                paste0("AMGD", c("PWA", "ADK", "PDP", "SDA", "SDK", "SDP")),
+                get_stc_vars(
+                  c(
+                    "BT",
+                    "WT",
+                    "HRS",
+                    "MBWT",
+                    "NSE",
+                    "WSE",
+                    "WET",
+                    "SET",
+                    "SEE",
+                    "RST",
+                    "SEM",
+                    "TDS",
+                    "RSE"
+                  )
+                )
+              )
+            )
+          )
+
         # If self$args$dir exists
         if (dir.exists(self$args$dir)) {
           # Set download directory

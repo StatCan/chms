@@ -864,29 +864,42 @@ summarize_agd_data <- function(x) {
           "CLINICID",
           paste0("AMGDT", 1:7),
           paste0("AMGDDOW", 1:7),
-          c(paste0("AMGDHR", 1:7), "AMGDHR"),
-          c(paste0("AMGDSLP", 1:7), "AMGDSLP"),
-          c(paste0("AMGDSST", 1:7), "AMGDSST"),
-          c(paste0("AMGDMA", 1:7), "AMGDMA"),
-          c(paste0("AMGDVA", 1:7), "AMGDVA"),
-          c(paste0("AMGDMVB", 1:7), "AMGDMVB"),
-          c(paste0("AMGDVB", 1:7), "AMGDVB"),
-          c(paste0("AMGDMB", 1:7), "AMGDMB"),
-          c(paste0("AMGDMVA", 1:7), "AMGDMVA"),
-          c(paste0("AMGDLA", 1:7), "AMGDLA"),
-          c(paste0("AMGDTA", 1:7), "AMGDTA"),
-          c(paste0("AMGDSA", 1:7), "AMGDSA"),
-          c(paste0("AMGDVAL", 1:7), "AMGDVAL"),
-          c(paste0("AMGDVLS", 1:7), "AMGDVLS"),
-          "AMGDPWA",
-          "AMGDADK",
-          "AMGDPDP",
-          "AMGDSDA",
-          "AMGDSDK",
-          "AMGDSDP",
-          c(paste0("AMGDBT", 1:7), "AMGDBT"),
-          c(paste0("AMGDWT", 1:7), "AMGDWT"),
-          c(paste0("AMGDHRS", 1:7), "AMGDHRS")
+          get_stc_vars(
+            c(
+              "HR",
+              "SLP",
+              "SST",
+              "MA",
+              "VA",
+              "MVB",
+              "VB",
+              "MB",
+              "MVA",
+              "LA",
+              "TA",
+              "SA",
+              "VAL",
+              "VLS"
+            )
+          ),
+          paste0("AMGD", c("PWA", "ADK", "PDP", "SDA", "SDK", "SDP")),
+          get_stc_vars(
+            c(
+              "BT",
+              "WT",
+              "HRS",
+              "MBWT",
+              "NSE",
+              "WSE",
+              "WET",
+              "SET",
+              "SEE",
+              "RST",
+              "SEM",
+              "TDS",
+              "RSE"
+            )
+          )
         )
       )
     )
@@ -923,6 +936,21 @@ summarize_agd_data <- function(x) {
       ),
       dplyr::across(
         .cols = nocturnal_sleep_onset:nocturnal_sleep_midpoint,
+        .fns = ~ dplyr::case_when(
+          .x == "1970-01-01" ~ "00:00:00",
+          TRUE ~ .x
+        )
+      )
+    )
+
+  x$results$summary_full_stc <- x$results$summary_full_stc |>
+    dplyr::mutate(
+      dplyr::across(
+        .cols = dplyr::where(is.character),
+        .fns = ~ gsub(pattern = "1970-01-01 ", replacement = "", x = .x)
+      ),
+      dplyr::across(
+        .cols = dplyr::where(is.character),
         .fns = ~ dplyr::case_when(
           .x == "1970-01-01" ~ "00:00:00",
           TRUE ~ .x
