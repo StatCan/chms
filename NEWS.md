@@ -1,4 +1,4 @@
-# chms 7.2.0
+# chms 7.2
 
 ## Bug fixes
 
