@@ -1,8 +1,11 @@
+# Ensure UTF-8 is set
+Sys.setlocale("LC_CTYPE", "English_Canada.UTF-8")
+
 # Create DESCRIPTION file
 usethis::use_description(
   fields = list(
     Package = "chms",
-    Version = "7.1.9000",
+    Version = "7.2",
     Title = "Accelerometer Processing Methods for Cycle 7 of the CHMS",
     Description = paste(
       "'ActiGraph wGT3X-BT' accelerometer processing methods using the",
@@ -92,9 +95,6 @@ usethis::use_mit_license(
 
 # Update NAMESPACE and create documentation
 devtools::check_man()
-
-# Add vignette field to DESCRIPTION
-desc::desc_set(VignetteBuilder = "knitr")
 
 # Lint package
 lintr::lint_package()
