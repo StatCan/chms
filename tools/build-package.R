@@ -5,7 +5,7 @@ Sys.setlocale("LC_CTYPE", "English_Canada.UTF-8")
 usethis::use_description(
   fields = list(
     Package = "chms",
-    Version = "7.2",
+    Version = "7.3",
     Title = "Accelerometer Processing Methods for Cycle 7 of the CHMS",
     Description = paste(
       "'ActiGraph wGT3X-BT' accelerometer processing methods using the",

@@ -774,9 +774,12 @@ summarize_agd_data <- function(x) {
         TRUE ~ NA
       ),
       amgdsda = dplyr::case_when(
-        x$args$age %in% 18:80 & amgdvls >= 3 & amgdslp >= 7 & amgdslp < 10 ~ 1,
-        x$args$age %in% 18:80 & amgdvls >= 3 &
+        x$args$age %in% 18:64 & amgdvls >= 3 & amgdslp >= 7 & amgdslp < 10 ~ 1,
+        x$args$age %in% 18:64 & amgdvls >= 3 &
           (amgdslp < 7 | amgdslp >= 10) ~ 2,
+        x$args$age %in% 65:80 & amgdvls >= 3 & amgdslp >= 7 & amgdslp < 9 ~ 1,
+        x$args$age %in% 65:80 & amgdvls >= 3 &
+          (amgdslp < 7 | amgdslp >= 9) ~ 2,
         TRUE ~ NA
       ),
       amgdsdk = dplyr::case_when(

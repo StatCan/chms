@@ -165,7 +165,7 @@ agd_data
 #> # A tibble: 1 × 4
 #>   method timestamp           status  message
 #>   <chr>  <dttm>              <chr>   <chr>  
-#> 1 new()  2026-10-05 13:17:31 success ""
+#> 1 new()  2026-11-13 08:43:48 success ""
 ```
 
 ``` r
@@ -187,7 +187,7 @@ agd_data$export(dir = tempdir())
 #> 
 #> ── 🍁chms::agd$export() method ──
 #> 
-#> ℹ Exporting results to 'C:\Users\Clippy\AppData\Local\Temp\Rtmp8gHkW5/agd-run-2026-10-05-13-17-39-496406'.
+#> ℹ Exporting results to 'C:\Users\Clippy\AppData\Local\Temp\Rtmpozi9uI/agd-run-2026-11-13-08-43-56-574819'.
 #> 
 #> ✔ Done!
 ```
@@ -198,7 +198,7 @@ agd_data$export(dir = tempdir(), stc = TRUE)
 #> 
 #> ── 🍁chms::agd$export() method ──
 #> 
-#> ℹ Exporting `self$results$summary_full_stc` and `self$results$summary_run` to 'C:\Users\Clippy\AppData\Local\Temp\Rtmp8gHkW5'.
+#> ℹ Exporting `self$results$summary_full_stc` and `self$results$summary_run` to 'C:\Users\Clippy\AppData\Local\Temp\Rtmpozi9uI'.
 #> 
 #> ✔ Done!
 ```
@@ -223,8 +223,8 @@ agd_data
 #> # A tibble: 2 × 4
 #>   method timestamp           status  message
 #>   <chr>  <dttm>              <chr>   <chr>  
-#> 1 new()  2026-10-05 13:17:31 success ""     
-#> 2 run()  2026-10-05 13:17:39 success ""
+#> 1 new()  2026-11-13 08:43:48 success ""     
+#> 2 run()  2026-11-13 08:43:56 success ""
 ```
 
 ``` r
@@ -512,7 +512,7 @@ agd_data
 #> # A tibble: 1 × 4
 #>   method timestamp           status  message
 #>   <chr>  <dttm>              <chr>   <chr>  
-#> 1 new()  2026-10-05 13:17:54 success ""
+#> 1 new()  2026-11-13 08:44:11 success ""
 ```
 
 ``` r
@@ -534,7 +534,7 @@ agd_data$export(dir = tempdir())
 #> 
 #> ── 🍁chms::agd$export() method ──
 #> 
-#> ℹ Exporting results to 'C:\Users\Clippy\AppData\Local\Temp\Rtmp8gHkW5/agd-run-2026-10-05-13-18-01-691848'.
+#> ℹ Exporting results to 'C:\Users\Clippy\AppData\Local\Temp\Rtmpozi9uI/agd-run-2026-11-13-08-44-19-584957'.
 #> 
 #> ✔ Done!
 ```
@@ -545,7 +545,7 @@ agd_data$export(dir = tempdir(), stc = TRUE)
 #> 
 #> ── 🍁chms::agd$export() method ──
 #> 
-#> ℹ Exporting `self$results$summary_full_stc` and `self$results$summary_run` to 'C:\Users\Clippy\AppData\Local\Temp\Rtmp8gHkW5'.
+#> ℹ Exporting `self$results$summary_full_stc` and `self$results$summary_run` to 'C:\Users\Clippy\AppData\Local\Temp\Rtmpozi9uI'.
 #> 
 #> ✔ Done!
 ```
@@ -570,8 +570,8 @@ agd_data
 #> # A tibble: 2 × 4
 #>   method timestamp           status  message
 #>   <chr>  <dttm>              <chr>   <chr>  
-#> 1 new()  2026-10-05 13:17:54 success ""     
-#> 2 run()  2026-10-05 13:18:01 success ""
+#> 1 new()  2026-11-13 08:44:11 success ""     
+#> 2 run()  2026-11-13 08:44:19 success ""
 ```
 
 ``` r

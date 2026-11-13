@@ -1,6 +1,6 @@
 Package: chms
 Title: Accelerometer Processing Methods for Cycle 7 of the CHMS
-Version: 7.2
+Version: 7.3
 Authors@R: c(
     person("Joel", "Barnes", , "joel.barnes@statcan.gc.ca", role = c("aut", "cre")),
     person("Janine", "Clarke", , "janine.clarke@statcan.gc.ca", role = "ctb"),
